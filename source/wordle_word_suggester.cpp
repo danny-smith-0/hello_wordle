@@ -44,6 +44,18 @@ size_t WordSuggester::remove_words_with_letter_position(char letter, size_t posi
     return _valid_answers.size();
 }
 
+size_t WordSuggester::remove_words_without_letter(char required_letter)
+{
+    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    {
+        if (itr->find(required_letter) == std::string::npos)
+            itr = _valid_answers.erase(itr);
+        else
+            ++itr;
+    }
+    return _valid_answers.size();
+}
+
 void WordSuggester::print_words(int words_per_row, std::vector<std::string> words)
 {
     // Default to printing the valid answers
