@@ -11,7 +11,16 @@ namespace wordle
     {
     public:
         void load_words();
-        std::vector<std::string> _words;
+        void print_words(int words_per_row = 1, std::vector<std::string> words = std::vector<std::string>());
+
+        size_t remove_words_with_letter(char letter);
+        size_t remove_words_with_letter_position(char letter, size_t position);
+        size_t remove_words_without_letter(char required_letter);
+
+        void which_word_should_i_choose(std::string required_letters);
+
+        std::vector<std::string> _valid_answers;
+        std::vector<std::string> _valid_guesses;
 
     };
 }
