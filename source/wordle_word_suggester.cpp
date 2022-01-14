@@ -1,8 +1,11 @@
 #include <wordle_word_suggester.h>
 
+#include <algorithm> // std::unique
 #include <iostream>  // std::cout
-#include <fstream>   // ifstream (and ofstream)
-#include <algorithm> // unique
+#include <iomanip>   // std::setw
+#include <fstream>   // std::ifstream (and ofstream)
+#include <map>       // std::map
+#include <sstream>   // std::stringstream
 
 using namespace wordle;
 
@@ -75,30 +78,153 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
     std::cout << "\n";
 }
 
+void WordSuggester::which_word_should_i_choose(std::string required_letters)
+{
+    // Get all the letters in the words that weren't required, grouped all together and by word
+    std::string unspecified_letters = "";
+    std::vector<std::string> unspecified_letters_by_word;
+    for (auto word : this->_valid_answers)
+    {
+        std::string required_letters_copy = required_letters;
+        std::string remaining_letters;
+        for (auto mychar : word)
+        {
+            if (required_letters_copy.find(mychar) != std::string::npos)
+                required_letters_copy.erase(required_letters_copy.find(mychar), 1);
+            else
+                remaining_letters += mychar;
+        }
+        unspecified_letters += remaining_letters;
+        unspecified_letters_by_word.push_back(remaining_letters);
+    }
+
+    // Count the unspecified letters
+    std::sort(unspecified_letters.begin(), unspecified_letters.end());
+    std::map<char, size_t> letter_count;
+    if (!unspecified_letters.empty())
+        letter_count[unspecified_letters[0]] = 1;
+    for (auto itr = unspecified_letters.begin(); itr != unspecified_letters.end() - 1; ++itr)
+    {
+        if (*(itr + 1) == *itr)
+            ++letter_count[*itr];
+        else
+            letter_count[*(itr + 1)] = 1;
+    }
+
+    // Remove non-unique letters
+    {
+        auto last = std::unique(unspecified_letters.begin(), unspecified_letters.end());
+        unspecified_letters.erase(last, unspecified_letters.end());
+    }
+    // Print the letter counts
+    std::cout << "Counts of the unspecified letters in the remaining words (alphabetical & by count)\n ";
+    for (auto letter : unspecified_letters)
+        std::cout << "  " << letter << " ";
+    std::cout << "\n";
+    for (auto letter : unspecified_letters)
+        std::cout << std::fixed << std::setw(4) << letter_count[letter];
+    std::cout << "\n\n";
+
+    // Backwards letter count, then print in order
+    std::map<size_t, std::string> backwards_letter_count;
+    for (auto [letter, score] : letter_count)
+        backwards_letter_count[score] += letter;
+
+    std::stringstream ss;
+    std::cout << "Scoring the remaining words by the count of their unique unspecified letters\n ";
+    for (auto ritr = backwards_letter_count.rbegin(); ritr != backwards_letter_count.rend(); ++ritr)
+    {
+        std::string letters = ritr->second;
+        while (!letters.empty())
+        {
+            std::cout << "  " << letters[0] << " ";
+            letters.erase(0, 1);
+            ss << std::fixed << std::setw(4) << ritr->first;
+        }
+    }
+    std::cout << "\n" << ss.str() << "\n\n";
+
+
+
+
+    // Score the remaining words by popular letter - easy first pass for a score
+    // std::map<std::string, size_t> scoring_words;
+    std::map<size_t, std::string> scoring_words;
+    for (size_t ii = 0; ii != unspecified_letters_by_word.size(); ++ii)
+    {
+        // Don't score a word for the same letter multiple times.
+        auto copy = unspecified_letters_by_word[ii];
+        std::sort(copy.begin(), copy.end());
+        auto last = std::unique(copy.begin(), copy.end());
+        copy.erase(last);
+
+        size_t score = 0;
+        for (auto mychar : copy)
+            score += letter_count[mychar];
+
+        // scoring_words[this->_valid_answers[ii]] = score;
+        scoring_words[score] += this->_valid_answers[ii];
+    }
+
+    // Print out the scored by score
+    for (auto ritr = scoring_words.rbegin(); ritr != scoring_words.rend(); ++ritr)
+    {
+        std::string words = ritr->second;
+        while (!words.empty())
+        {
+            std::string word (words.begin(), words.begin() + 5);
+            words.erase(words.begin(), words.begin() + 5);
+            std::cout << word << " : " << ritr->first << "\n";
+        }
+    }
+    std::cout << "\n";
+    /*
+    Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
+    Which touches the most words, but also leads us closer to a final answer.
+    It's tricky, because there are a lot of types of information. It'll be fun to work through
+
+    So far I haven't been considering location of the letters after the initial removing, before this function. That will affect how to get info.
+    */
+}
+
 int main()
 {
     WordSuggester word_suggester;
     word_suggester.load_words();
 
-    // std::string letters_not_included = "storplinfcd";
+    std::cout << "hello world\n";
 
-    // for (auto remove_char : letters_not_included)
-    //     word_suggester.remove_words_with_letter(remove_char);
+    //stare, baton, gaunt
+    std::string unallowed_letters = "srebou";
+    std::string required_letters  = "tang";
 
-    // word_suggester.remove_words_with_letter_position('a', 1);
-    // word_suggester.remove_words_with_letter_position('a', 2);
-    // word_suggester.remove_words_with_letter_position('e', 4);
+    std::cout << "required_letters:  " << required_letters << "\n";
+    std::cout << "unallowed_letters: " << unallowed_letters << "\n";
 
-    // {
-    //     word_suggester.remove_words_with_letter_position('e', 0);
-    //     word_suggester.remove_words_with_letter_position('e', 1);
-    //     word_suggester.remove_words_with_letter_position('e', 2);
-    // }
+    for (auto remove_char : unallowed_letters)
+        word_suggester.remove_words_with_letter(remove_char);
+
+    for (auto required_char : required_letters)
+        word_suggester.remove_words_without_letter(required_char);
+
+    word_suggester.remove_words_with_letter_position('t', 1);
+    word_suggester.remove_words_with_letter_position('t', 2);
+    word_suggester.remove_words_with_letter_position('t', 4);
+
+    word_suggester.remove_words_with_letter_position('g', 0);
+
+    word_suggester.remove_words_with_letter_position('a', 0);
+    word_suggester.remove_words_with_letter_position('a', 2);
+    word_suggester.remove_words_with_letter_position('a', 3);
+    word_suggester.remove_words_with_letter_position('a', 4);
+
+    word_suggester.remove_words_with_letter_position('n', 3);
+    word_suggester.remove_words_with_letter_position('n', 4);
 
 
-    // TODO add the ability to get the unspecified letters of the possible words
+    word_suggester.which_word_should_i_choose(required_letters);
 
-    word_suggester.print_words(1);
+    // word_suggester.print_words();
 
     int c = 0;
     c++;
