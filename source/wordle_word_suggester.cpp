@@ -15,7 +15,7 @@ void sort_and_remove_non_unique_elements(T* vector_or_string)
 {
     std::sort(vector_or_string->begin(), vector_or_string->end());
     auto itr_last = std::unique(vector_or_string->begin(), vector_or_string->end());
-    vector_or_string->erase(itr_last);
+    vector_or_string->erase(itr_last, vector_or_string->end());
 }
 
 void WordSuggester::load_words()
