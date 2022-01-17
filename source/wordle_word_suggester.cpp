@@ -217,10 +217,9 @@ void WordSuggester::which_word_should_i_choose(std::string included_letters)
 
 int main()
 {
+    std::cout << "Hello Wordle!\n";
     WordSuggester word_suggester;
-    word_suggester.load_words();
-
-    std::cout << "hello wordle\n";
+    std::cout << "Libraries loaded.\n";
 
     // word_suggester.black_letter( '');
     // word_suggester.green_letter( '', );
