@@ -17,7 +17,7 @@ namespace wordle
         void green_letter(char letter, size_t correct_position);
         void yellow_letter(char letter, size_t wrong_position);
 
-        void which_word_should_i_choose(std::string required_letters);
+        void which_word_should_i_choose();
 
     private:
         // functions
@@ -30,6 +30,8 @@ namespace wordle
         // variables
         std::vector<std::string> _valid_answers;
         std::vector<std::string> _valid_guesses;
+
+        std::string _required_letters;
     };
 }
 

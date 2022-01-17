@@ -83,6 +83,9 @@ void WordSuggester::yellow_letter(char letter, size_t wrong_position)
 
 size_t WordSuggester::remove_words_without_letter(char required_letter)
 {
+    if (_required_letters.find(required_letter) == std::string::npos)
+        _required_letters += required_letter;
+
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
     {
         if (itr->find(required_letter) == std::string::npos)
@@ -112,19 +115,19 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
     std::cout << "\n";
 }
 
-void WordSuggester::which_word_should_i_choose(std::string included_letters)
+void WordSuggester::which_word_should_i_choose()
 {
     // Get all the letters in the words that weren't required, grouped all together and by word
     std::string unspecified_letters = "";
     std::vector<std::string> unspecified_letters_by_word;
     for (auto word : this->_valid_answers)
     {
-        std::string includeds = included_letters;  // Make a copy so we can edit
+        std::string reqs = this->_required_letters;  // Make a copy so we can edit
         std::string remaining_letters;
         for (auto mychar : word)
         {
-            if (includeds.find(mychar) != std::string::npos)
-                includeds.erase(includeds.find(mychar), 1);
+            if (reqs.find(mychar) != std::string::npos)
+                reqs.erase(reqs.find(mychar), 1);
             else
                 remaining_letters += mychar;
         }
@@ -243,12 +246,9 @@ int main()
     word_suggester.yellow_letter('n', 3);
     word_suggester.yellow_letter('t', 4);
 
-    // //stare, baton, gaunt
-    // std::string included_letters  = "tang";
-    // std::cout << "included letters:  " << included_letters << "\n";
-    // word_suggester.which_word_should_i_choose(included_letters);
+    word_suggester.which_word_should_i_choose();
 
-    word_suggester.print_words();
+    // word_suggester.print_words();
 
     int c = 0;
     c++;
