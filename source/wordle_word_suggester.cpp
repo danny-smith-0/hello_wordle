@@ -56,6 +56,31 @@ size_t WordSuggester::remove_words_with_letter_position(char letter, size_t posi
     return _valid_answers.size();
 }
 
+void WordSuggester::black_letter(char letter)
+{
+    this->remove_words_with_letter(letter);
+}
+
+
+void WordSuggester::green_letter(char letter, size_t correct_position)
+{
+    this->remove_words_without_letter(letter);
+
+    // Remove words with this letter in everything position except the correct one
+    if (correct_position != 0) this->remove_words_with_letter_position(letter, 0);
+    if (correct_position != 1) this->remove_words_with_letter_position(letter, 1);
+    if (correct_position != 2) this->remove_words_with_letter_position(letter, 2);
+    if (correct_position != 3) this->remove_words_with_letter_position(letter, 3);
+    if (correct_position != 4) this->remove_words_with_letter_position(letter, 4);
+}
+
+void WordSuggester::yellow_letter(char letter, size_t wrong_position)
+{
+    this->remove_words_without_letter(letter);
+
+    this->remove_words_with_letter_position(letter, wrong_position);
+}
+
 size_t WordSuggester::remove_words_without_letter(char required_letter)
 {
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
@@ -197,37 +222,34 @@ int main()
 
     std::cout << "hello wordle\n";
 
-    //stare, baton, gaunt
-    std::string excluded_letters = "srebou";
-    std::string included_letters  = "tang";
+    // word_suggester.black_letter( '');
+    // word_suggester.green_letter( '', );
+    // word_suggester.yellow_letter('', );
 
-    std::cout << "included letters:  " << included_letters << "\n";
-    std::cout << "excluded letters: " << excluded_letters << "\n";
+    word_suggester.black_letter( 's');
+    word_suggester.yellow_letter('t', 1);
+    word_suggester.yellow_letter('a', 2);
+    word_suggester.black_letter( 'r');
+    word_suggester.black_letter( 'e');
 
-    for (auto remove_char : excluded_letters)
-        word_suggester.remove_words_with_letter(remove_char);
+    word_suggester.black_letter( 'b');
+    word_suggester.green_letter( 'a', 1);
+    word_suggester.yellow_letter('t', 2);
+    word_suggester.black_letter( 'o');
+    word_suggester.yellow_letter('n', 4);
 
-    for (auto required_char : included_letters)
-        word_suggester.remove_words_without_letter(required_char);
+    word_suggester.yellow_letter('g', 0);
+    word_suggester.green_letter( 'a', 1);
+    word_suggester.black_letter( 'u');
+    word_suggester.yellow_letter('n', 3);
+    word_suggester.yellow_letter('t', 4);
 
-    word_suggester.remove_words_with_letter_position('t', 1);
-    word_suggester.remove_words_with_letter_position('t', 2);
-    word_suggester.remove_words_with_letter_position('t', 4);
+    // //stare, baton, gaunt
+    // std::string included_letters  = "tang";
+    // std::cout << "included letters:  " << included_letters << "\n";
+    // word_suggester.which_word_should_i_choose(included_letters);
 
-    word_suggester.remove_words_with_letter_position('g', 0);
-
-    word_suggester.remove_words_with_letter_position('a', 0);
-    word_suggester.remove_words_with_letter_position('a', 2);
-    word_suggester.remove_words_with_letter_position('a', 3);
-    word_suggester.remove_words_with_letter_position('a', 4);
-
-    word_suggester.remove_words_with_letter_position('n', 3);
-    word_suggester.remove_words_with_letter_position('n', 4);
-
-
-    word_suggester.which_word_should_i_choose(included_letters);
-
-    // word_suggester.print_words();
+    word_suggester.print_words();
 
     int c = 0;
     c++;
