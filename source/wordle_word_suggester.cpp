@@ -228,23 +228,23 @@ int main()
     // word_suggester.green_letter( '', );
     // word_suggester.yellow_letter('', );
 
-    word_suggester.black_letter( 's');
-    word_suggester.yellow_letter('t', 1);
-    word_suggester.yellow_letter('a', 2);
-    word_suggester.black_letter( 'r');
-    word_suggester.black_letter( 'e');
+    word_suggester.black_letter( 'l');
+    word_suggester.black_letter( 'a');
+    word_suggester.black_letter( 't');
+    word_suggester.yellow_letter('e', 3);
+    word_suggester.yellow_letter('r', 4);
 
-    word_suggester.black_letter( 'b');
-    word_suggester.green_letter( 'a', 1);
-    word_suggester.yellow_letter('t', 2);
+    word_suggester.black_letter( 'p');
+    word_suggester.yellow_letter('r', 1);
     word_suggester.black_letter( 'o');
-    word_suggester.yellow_letter('n', 4);
+    word_suggester.yellow_letter('s', 3);
+    word_suggester.green_letter( 'e', 4);
 
-    word_suggester.yellow_letter('g', 0);
-    word_suggester.green_letter( 'a', 1);
+    word_suggester.green_letter( 's', 0);
     word_suggester.black_letter( 'u');
-    word_suggester.yellow_letter('n', 3);
-    word_suggester.yellow_letter('t', 4);
+    word_suggester.yellow_letter('r', 2);
+    word_suggester.black_letter( 'g');
+    word_suggester.green_letter( 'e', 4);
 
     word_suggester.which_word_should_i_choose();
 
