@@ -48,7 +48,7 @@ size_t WordSuggester::remove_words_with_letter_position(char letter, size_t posi
 {
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
     {
-        if (itr->find(letter) == position)
+        if (itr->find(letter) != std::string::npos && itr->at(position) == letter)
             itr = _valid_answers.erase(itr);
         else
             ++itr;
