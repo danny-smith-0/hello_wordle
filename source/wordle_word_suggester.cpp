@@ -65,13 +65,6 @@ void WordSuggester::black_letter(char letter)
 void WordSuggester::green_letter(char letter, size_t correct_position)
 {
     this->remove_words_without_letter(letter);
-
-    // Remove words with this letter in everything position except the correct one
-    if (correct_position != 0) this->remove_words_with_letter_position(letter, 0);
-    if (correct_position != 1) this->remove_words_with_letter_position(letter, 1);
-    if (correct_position != 2) this->remove_words_with_letter_position(letter, 2);
-    if (correct_position != 3) this->remove_words_with_letter_position(letter, 3);
-    if (correct_position != 4) this->remove_words_with_letter_position(letter, 4);
 }
 
 void WordSuggester::yellow_letter(char letter, size_t wrong_position)
