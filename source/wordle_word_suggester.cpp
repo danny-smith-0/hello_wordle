@@ -64,7 +64,7 @@ void WordSuggester::black_letter(char letter)
 
 void WordSuggester::green_letter(char letter, size_t correct_position)
 {
-    this->remove_words_without_letter(letter);
+    this->remove_words_without_letter_position(letter, correct_position);
 }
 
 void WordSuggester::yellow_letter(char letter, size_t wrong_position)
@@ -88,6 +88,23 @@ size_t WordSuggester::remove_words_without_letter(char required_letter)
     }
     return _valid_answers.size();
 }
+
+size_t WordSuggester::remove_words_without_letter_position(char required_letter, size_t position)
+{
+    if (_required_letters.find(required_letter) == std::string::npos)
+        _required_letters += required_letter;
+
+
+    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    {
+        if (itr->find(required_letter) == std::string::npos || itr->at(position) != required_letter)
+            itr = _valid_answers.erase(itr);
+        else
+            ++itr;
+    }
+    return _valid_answers.size();
+}
+
 
 void WordSuggester::print_words(int words_per_row, std::vector<std::string> words)
 {

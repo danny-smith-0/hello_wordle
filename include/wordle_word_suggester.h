@@ -26,6 +26,7 @@ namespace wordle
         size_t remove_words_with_letter(char letter);
         size_t remove_words_with_letter_position(char letter, size_t position);
         size_t remove_words_without_letter(char required_letter);
+        size_t remove_words_without_letter_position(char required_letter, size_t position);
 
         // variables
         std::vector<std::string> _valid_answers;
