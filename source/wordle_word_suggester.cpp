@@ -44,11 +44,11 @@ size_t WordSuggester::remove_words_with_letter(char letter)
     return _valid_answers.size();
 }
 
-size_t WordSuggester::remove_words_with_letter_position(char letter, size_t position)
+size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
 {
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
     {
-        if (itr->find(letter) == position)
+        if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
             itr = _valid_answers.erase(itr);
         else
             ++itr;
@@ -56,8 +56,29 @@ size_t WordSuggester::remove_words_with_letter_position(char letter, size_t posi
     return _valid_answers.size();
 }
 
+void WordSuggester::black_letter(char letter)
+{
+    this->remove_words_with_letter(letter);
+}
+
+
+void WordSuggester::green_letter(char letter, size_t correct_index)
+{
+    this->remove_words_without_letter_index(letter, correct_index);
+}
+
+void WordSuggester::yellow_letter(char letter, size_t wrong_index)
+{
+    this->remove_words_without_letter(letter);
+
+    this->remove_words_with_letter_index(letter, wrong_index);
+}
+
 size_t WordSuggester::remove_words_without_letter(char required_letter)
 {
+    if (_required_letters.find(required_letter) == std::string::npos)
+        _required_letters += required_letter;
+
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
     {
         if (itr->find(required_letter) == std::string::npos)
@@ -67,6 +88,23 @@ size_t WordSuggester::remove_words_without_letter(char required_letter)
     }
     return _valid_answers.size();
 }
+
+size_t WordSuggester::remove_words_without_letter_index(char required_letter, size_t index)
+{
+    if (_required_letters.find(required_letter) == std::string::npos)
+        _required_letters += required_letter;
+
+
+    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    {
+        if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
+            itr = _valid_answers.erase(itr);
+        else
+            ++itr;
+    }
+    return _valid_answers.size();
+}
+
 
 void WordSuggester::print_words(int words_per_row, std::vector<std::string> words)
 {
@@ -87,19 +125,19 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
     std::cout << "\n";
 }
 
-void WordSuggester::which_word_should_i_choose(std::string included_letters)
+void WordSuggester::suggest()
 {
     // Get all the letters in the words that weren't required, grouped all together and by word
     std::string unspecified_letters = "";
     std::vector<std::string> unspecified_letters_by_word;
     for (auto word : this->_valid_answers)
     {
-        std::string includeds = included_letters;  // Make a copy so we can edit
+        std::string reqs = this->_required_letters;  // Make a copy so we can edit
         std::string remaining_letters;
         for (auto mychar : word)
         {
-            if (includeds.find(mychar) != std::string::npos)
-                includeds.erase(includeds.find(mychar), 1);
+            if (reqs.find(mychar) != std::string::npos)
+                reqs.erase(reqs.find(mychar), 1);
             else
                 remaining_letters += mychar;
         }
@@ -169,16 +207,20 @@ void WordSuggester::which_word_should_i_choose(std::string included_letters)
     }
 
     // Print out the scored by score
+    size_t count = 0;
+    size_t word_print_cutoff = 50;
     for (auto ritr = scoring_words.rbegin(); ritr != scoring_words.rend(); ++ritr)
     {
         std::string words = ritr->second;
-        while (!words.empty())
+        while (count++ < word_print_cutoff && !words.empty())
         {
             std::string word (words.begin(), words.begin() + 5);
             words.erase(words.begin(), words.begin() + 5);
             std::cout << word << " : " << ritr->first << "\n";
         }
     }
+    if ( count >= word_print_cutoff)
+        std::cout << " Printed only " << word_print_cutoff << " of " << count << " words\n";
     std::cout << "\n";
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
@@ -192,40 +234,17 @@ void WordSuggester::which_word_should_i_choose(std::string included_letters)
 
 int main()
 {
+    std::cout << "Hello Wordle!\n";
     WordSuggester word_suggester;
-    word_suggester.load_words();
+    std::cout << "Libraries loaded.\n";
 
-    std::cout << "hello wordle\n";
-
-    //stare, baton, gaunt
-    std::string excluded_letters = "srebou";
-    std::string included_letters  = "tang";
-
-    std::cout << "included letters:  " << included_letters << "\n";
-    std::cout << "excluded letters: " << excluded_letters << "\n";
-
-    for (auto remove_char : excluded_letters)
-        word_suggester.remove_words_with_letter(remove_char);
-
-    for (auto required_char : included_letters)
-        word_suggester.remove_words_without_letter(required_char);
-
-    word_suggester.remove_words_with_letter_position('t', 1);
-    word_suggester.remove_words_with_letter_position('t', 2);
-    word_suggester.remove_words_with_letter_position('t', 4);
-
-    word_suggester.remove_words_with_letter_position('g', 0);
-
-    word_suggester.remove_words_with_letter_position('a', 0);
-    word_suggester.remove_words_with_letter_position('a', 2);
-    word_suggester.remove_words_with_letter_position('a', 3);
-    word_suggester.remove_words_with_letter_position('a', 4);
-
-    word_suggester.remove_words_with_letter_position('n', 3);
-    word_suggester.remove_words_with_letter_position('n', 4);
+    // word_suggester.black_letter( '');
+    // word_suggester.green_letter( '', );
+    // word_suggester.yellow_letter('', );
 
 
-    word_suggester.which_word_should_i_choose(included_letters);
+
+    word_suggester.suggest();
 
     // word_suggester.print_words();
 
