@@ -17,7 +17,7 @@ namespace wordle
         void green_letter(char letter, size_t correct_position);
         void yellow_letter(char letter, size_t wrong_position);
 
-        void which_word_should_i_choose();
+        void suggest();
 
     private:
         // functions

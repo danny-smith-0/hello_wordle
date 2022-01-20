@@ -125,7 +125,7 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
     std::cout << "\n";
 }
 
-void WordSuggester::which_word_should_i_choose()
+void WordSuggester::suggest()
 {
     // Get all the letters in the words that weren't required, grouped all together and by word
     std::string unspecified_letters = "";
@@ -256,7 +256,7 @@ int main()
     word_suggester.black_letter( 'g');
     word_suggester.green_letter( 'e', 4);
 
-    word_suggester.which_word_should_i_choose();
+    word_suggester.suggest();
 
     // word_suggester.print_words();
 
