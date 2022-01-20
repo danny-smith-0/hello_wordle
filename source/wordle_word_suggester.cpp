@@ -44,11 +44,11 @@ size_t WordSuggester::remove_words_with_letter(char letter)
     return _valid_answers.size();
 }
 
-size_t WordSuggester::remove_words_with_letter_position(char letter, size_t position)
+size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
 {
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
     {
-        if (itr->find(letter) != std::string::npos && itr->at(position) == letter)
+        if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
             itr = _valid_answers.erase(itr);
         else
             ++itr;
@@ -62,16 +62,16 @@ void WordSuggester::black_letter(char letter)
 }
 
 
-void WordSuggester::green_letter(char letter, size_t correct_position)
+void WordSuggester::green_letter(char letter, size_t correct_index)
 {
-    this->remove_words_without_letter_position(letter, correct_position);
+    this->remove_words_without_letter_index(letter, correct_index);
 }
 
-void WordSuggester::yellow_letter(char letter, size_t wrong_position)
+void WordSuggester::yellow_letter(char letter, size_t wrong_index)
 {
     this->remove_words_without_letter(letter);
 
-    this->remove_words_with_letter_position(letter, wrong_position);
+    this->remove_words_with_letter_index(letter, wrong_index);
 }
 
 size_t WordSuggester::remove_words_without_letter(char required_letter)
@@ -89,7 +89,7 @@ size_t WordSuggester::remove_words_without_letter(char required_letter)
     return _valid_answers.size();
 }
 
-size_t WordSuggester::remove_words_without_letter_position(char required_letter, size_t position)
+size_t WordSuggester::remove_words_without_letter_index(char required_letter, size_t index)
 {
     if (_required_letters.find(required_letter) == std::string::npos)
         _required_letters += required_letter;
@@ -97,7 +97,7 @@ size_t WordSuggester::remove_words_without_letter_position(char required_letter,
 
     for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
     {
-        if (itr->find(required_letter) == std::string::npos || itr->at(position) != required_letter)
+        if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
             itr = _valid_answers.erase(itr);
         else
             ++itr;
