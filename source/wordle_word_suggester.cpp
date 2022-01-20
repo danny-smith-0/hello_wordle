@@ -207,16 +207,20 @@ void WordSuggester::suggest()
     }
 
     // Print out the scored by score
+    size_t count = 0;
+    size_t word_print_cutoff = 50;
     for (auto ritr = scoring_words.rbegin(); ritr != scoring_words.rend(); ++ritr)
     {
         std::string words = ritr->second;
-        while (!words.empty())
+        while (count++ < word_print_cutoff && !words.empty())
         {
             std::string word (words.begin(), words.begin() + 5);
             words.erase(words.begin(), words.begin() + 5);
             std::cout << word << " : " << ritr->first << "\n";
         }
     }
+    if ( count >= word_print_cutoff)
+        std::cout << " Printed only " << word_print_cutoff << " of " << count << " words\n";
     std::cout << "\n";
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
