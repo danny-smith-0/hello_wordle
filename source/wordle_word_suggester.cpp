@@ -61,6 +61,10 @@ void WordSuggester::black_letter(char letter)
     this->remove_words_with_letter(letter);
 }
 
+void WordSuggester::black_duplicate_letter(char letter)
+{
+    // this->remove_words_with_letter(letter);
+}
 
 void WordSuggester::green_letter(char letter, size_t correct_index)
 {
