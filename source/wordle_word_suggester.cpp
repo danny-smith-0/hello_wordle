@@ -24,36 +24,48 @@ void WordSuggester::load_words()
     std::ifstream file_stream1 (file_path);
     std::string line;
     while (std::getline(file_stream1, line))
-        _valid_answers.push_back(line);
+        _valid_answers_orig.push_back(line);
 
     file_path = "../include/valid_guesses.txt";
     std::ifstream file_stream2 (file_path);
     while (std::getline(file_stream2, line))
-        _valid_guesses.push_back(line);
+        _valid_guesses_orig.push_back(line);
+
+    _valid_answers_trimmed = _valid_answers_orig;
+    _valid_guesses_trimmed = _valid_guesses_orig;
 }
 
 size_t WordSuggester::remove_words_with_letter(char letter)
 {
-    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
         if (itr->find(letter) != std::string::npos)
-            itr = _valid_answers.erase(itr);
+            itr = _valid_answers_trimmed.erase(itr);
         else
             ++itr;
     }
-    return _valid_answers.size();
+
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(letter) != std::string::npos)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+
+    return _valid_answers_trimmed.size();
 }
 
 size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
 {
-    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
         if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
-            itr = _valid_answers.erase(itr);
+            itr = _valid_answers_trimmed.erase(itr);
         else
             ++itr;
     }
-    return _valid_answers.size();
+    return _valid_answers_trimmed.size();
 }
 
 void WordSuggester::black_letter(char letter)
@@ -79,14 +91,14 @@ size_t WordSuggester::remove_words_without_letter(char required_letter)
     if (_required_letters.find(required_letter) == std::string::npos)
         _required_letters += required_letter;
 
-    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
         if (itr->find(required_letter) == std::string::npos)
-            itr = _valid_answers.erase(itr);
+            itr = _valid_answers_trimmed.erase(itr);
         else
             ++itr;
     }
-    return _valid_answers.size();
+    return _valid_answers_trimmed.size();
 }
 
 size_t WordSuggester::remove_words_without_letter_index(char required_letter, size_t index)
@@ -95,14 +107,14 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
         _required_letters += required_letter;
 
 
-    for (auto itr = _valid_answers.begin(); itr != _valid_answers.end(); )
+    for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
         if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
-            itr = _valid_answers.erase(itr);
+            itr = _valid_answers_trimmed.erase(itr);
         else
             ++itr;
     }
-    return _valid_answers.size();
+    return _valid_answers_trimmed.size();
 }
 
 
@@ -110,7 +122,7 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
 {
     // Default to printing the valid answers
     if (words.empty())
-        words = this->_valid_answers;
+        words = this->_valid_answers_trimmed;
 
     int count = 1;
     for (auto word : words)
@@ -125,14 +137,11 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
     std::cout << "\n";
 }
 
-void WordSuggester::suggest()
+void WordSuggester::subtract_required_letters(std::vector<std::string> const& words, std::string required_letters, std::string* unspecified_letters, std::vector<std::string>* unspecified_letters_by_word)
 {
-    // Get all the letters in the words that weren't required, grouped all together and by word
-    std::string unspecified_letters = "";
-    std::vector<std::string> unspecified_letters_by_word;
-    for (auto word : this->_valid_answers)
+    for (auto word : words)
     {
-        std::string reqs = this->_required_letters;  // Make a copy so we can edit
+        std::string reqs = required_letters;  // Make a copy so we can edit
         std::string remaining_letters;
         for (auto mychar : word)
         {
@@ -141,9 +150,22 @@ void WordSuggester::suggest()
             else
                 remaining_letters += mychar;
         }
-        unspecified_letters += remaining_letters;
-        unspecified_letters_by_word.push_back(remaining_letters);
+        if (unspecified_letters)
+            *unspecified_letters += remaining_letters;
+        if (unspecified_letters_by_word)
+            unspecified_letters_by_word->push_back(remaining_letters);
     }
+}
+
+void WordSuggester::suggest()
+{
+    // Get all the letters in the words that weren't required, grouped all together and by word
+    std::string unspecified_letters = "";
+    std::vector<std::string> unspecified_letters_by_word;
+    std::vector<std::string> unspecified_letters_by_word__guesses;
+
+    subtract_required_letters(this->_valid_answers_trimmed, this->_required_letters, &unspecified_letters, &unspecified_letters_by_word);
+    subtract_required_letters(this->_valid_guesses_orig, this->_required_letters,                    0, &unspecified_letters_by_word__guesses);
 
     // Count the unspecified letters
     std::sort(unspecified_letters.begin(), unspecified_letters.end());
@@ -202,8 +224,8 @@ void WordSuggester::suggest()
         for (auto mychar : one_words_unspecifieds)
             score += letter_count[mychar];
 
-        // scoring_words[this->_valid_answers[ii]] = score;
-        scoring_words[score] += this->_valid_answers[ii];
+        // scoring_words[this->_valid_answers_trimmed[ii]] = score;
+        scoring_words[score] += this->_valid_answers_trimmed[ii];
     }
 
     // Print out the scored by score
