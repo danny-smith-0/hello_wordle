@@ -4,7 +4,6 @@
 #include <iostream>  // std::cout
 #include <iomanip>   // std::setw
 #include <fstream>   // std::ifstream (and ofstream)
-#include <map>       // std::map
 #include <sstream>   // std::stringstream
 
 using namespace wordle;
@@ -37,6 +36,9 @@ void WordSuggester::load_words()
 
 size_t WordSuggester::remove_words_with_letter(char letter)
 {
+    if (_excluded_letters.find(letter) == std::string::npos)
+        _excluded_letters += letter;
+
     for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
         if (itr->find(letter) != std::string::npos)
@@ -65,6 +67,14 @@ size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
         else
             ++itr;
     }
+
+    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    // {
+    //     if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
+    //         itr = _valid_guesses_trimmed.erase(itr);
+    //     else
+    //         ++itr;
+    // }
     return _valid_answers_trimmed.size();
 }
 
@@ -98,6 +108,14 @@ size_t WordSuggester::remove_words_without_letter(char required_letter)
         else
             ++itr;
     }
+
+    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    // {
+    //     if (itr->find(required_letter) == std::string::npos)
+    //         itr = _valid_guesses_trimmed.erase(itr);
+    //     else
+    //         ++itr;
+    // }
     return _valid_answers_trimmed.size();
 }
 
@@ -106,7 +124,6 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
     if (_required_letters.find(required_letter) == std::string::npos)
         _required_letters += required_letter;
 
-
     for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
         if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
@@ -114,6 +131,15 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
         else
             ++itr;
     }
+
+    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    // {
+    //     if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
+    //         itr = _valid_guesses_trimmed.erase(itr);
+    //     else
+    //         ++itr;
+    // }
+
     return _valid_answers_trimmed.size();
 }
 
@@ -157,6 +183,47 @@ void WordSuggester::subtract_required_letters(std::vector<std::string> const& wo
     }
 }
 
+void WordSuggester::score_words_by_letter_scores(std::vector<std::string> const& unspecified_letters_by_word, std::vector<std::string> const& original_words, std::map<char, size_t> const& letter_count)
+{
+    // std::map<std::string, size_t> scoring_words;
+    std::map<size_t, std::string> scoring_words;
+    for (size_t ii = 0; ii != unspecified_letters_by_word.size(); ++ii)
+    {
+        // Don't score a word for the same letter multiple times.
+        auto one_words_unspecifieds = unspecified_letters_by_word[ii];  // Make a copy so we can edit
+        sort_and_remove_non_unique_elements(&one_words_unspecifieds);
+
+        size_t score = 0;
+        for (auto mychar : one_words_unspecifieds)
+        {
+            if (letter_count.find(mychar) == letter_count.end())
+                continue;
+            score += letter_count.at(mychar);
+        }
+
+        // scoring_words[this->_valid_answers_trimmed[ii]] = score;
+        scoring_words[score] += original_words[ii];
+    }
+
+    // Print out the scored by score
+    size_t count = 0;
+    size_t word_print_cutoff = 25;
+    for (auto ritr = scoring_words.rbegin(); ritr != scoring_words.rend(); ++ritr)
+    {
+        std::string words = ritr->second;
+        while (count < word_print_cutoff && !words.empty())
+        {
+            std::string word (words.begin(), words.begin() + 5);
+            words.erase(words.begin(), words.begin() + 5);
+            std::cout << word << " : " << ritr->first << "\n";
+            ++count;
+        }
+    }
+    if ( count >= word_print_cutoff)
+        std::cout << " Printed only " << word_print_cutoff << " of " << count << " words\n";
+    std::cout << "\n";
+}
+
 void WordSuggester::suggest()
 {
     // Get all the letters in the words that weren't required, grouped all together and by word
@@ -165,9 +232,9 @@ void WordSuggester::suggest()
     std::vector<std::string> unspecified_letters_by_word__guesses;
 
     subtract_required_letters(this->_valid_answers_trimmed, this->_required_letters, &unspecified_letters, &unspecified_letters_by_word);
-    subtract_required_letters(this->_valid_guesses_orig, this->_required_letters,                    0, &unspecified_letters_by_word__guesses);
+    subtract_required_letters(this->_valid_guesses_orig,    this->_required_letters,                    0, &unspecified_letters_by_word__guesses);
 
-    // Count the unspecified letters
+    // Count (score) the unspecified letters
     std::sort(unspecified_letters.begin(), unspecified_letters.end());
     std::map<char, size_t> letter_count;
     if (!unspecified_letters.empty())
@@ -183,14 +250,14 @@ void WordSuggester::suggest()
     // Remove non-unique letters
     sort_and_remove_non_unique_elements(&unspecified_letters);
 
-    // Print the letter counts
-    std::cout << "Counts of the unspecified letters in the remaining words (alphabetical & by count)\n ";
-    for (auto letter : unspecified_letters)
-        std::cout << "  " << letter << " ";
-    std::cout << "\n";
-    for (auto letter : unspecified_letters)
-        std::cout << std::fixed << std::setw(4) << letter_count[letter];
-    std::cout << "\n\n";
+    // // Print the letter counts
+    // std::cout << "Counts of the unspecified letters in the remaining words (alphabetical & by count)\n ";
+    // for (auto letter : unspecified_letters)
+    //     std::cout << "  " << letter << " ";
+    // std::cout << "\n";
+    // for (auto letter : unspecified_letters)
+    //     std::cout << std::fixed << std::setw(4) << letter_count[letter];
+    // std::cout << "\n\n";
 
     // Backwards letter count, then print in order
     std::map<size_t, std::string> backwards_letter_count;
@@ -212,38 +279,11 @@ void WordSuggester::suggest()
     std::cout << "\n" << ss.str() << "\n\n";
 
     // Score the remaining words by popular letter - easy first pass for a score
-    // std::map<std::string, size_t> scoring_words;
-    std::map<size_t, std::string> scoring_words;
-    for (size_t ii = 0; ii != unspecified_letters_by_word.size(); ++ii)
-    {
-        // Don't score a word for the same letter multiple times.
-        auto one_words_unspecifieds = unspecified_letters_by_word[ii];  // Make a copy so we can edit
-        sort_and_remove_non_unique_elements(&one_words_unspecifieds);
+    std::cout << "valid answers: \n";
+    score_words_by_letter_scores(unspecified_letters_by_word, this->_valid_answers_trimmed, letter_count);
+    std::cout << "valid guesses (invalid answers): \n";
+    score_words_by_letter_scores(unspecified_letters_by_word__guesses, this->_valid_guesses_orig, letter_count);
 
-        size_t score = 0;
-        for (auto mychar : one_words_unspecifieds)
-            score += letter_count[mychar];
-
-        // scoring_words[this->_valid_answers_trimmed[ii]] = score;
-        scoring_words[score] += this->_valid_answers_trimmed[ii];
-    }
-
-    // Print out the scored by score
-    size_t count = 0;
-    size_t word_print_cutoff = 50;
-    for (auto ritr = scoring_words.rbegin(); ritr != scoring_words.rend(); ++ritr)
-    {
-        std::string words = ritr->second;
-        while (count++ < word_print_cutoff && !words.empty())
-        {
-            std::string word (words.begin(), words.begin() + 5);
-            words.erase(words.begin(), words.begin() + 5);
-            std::cout << word << " : " << ritr->first << "\n";
-        }
-    }
-    if ( count >= word_print_cutoff)
-        std::cout << " Printed only " << word_print_cutoff << " of " << count << " words\n";
-    std::cout << "\n";
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
     Which touches the most words, but also leads us closer to a final answer.
