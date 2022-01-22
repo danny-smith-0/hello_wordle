@@ -178,13 +178,19 @@ void WordSuggester::subtract_required_letters(std::vector<std::string> const& wo
         }
         if (unspecified_letters)
             *unspecified_letters += remaining_letters;
-        if (unspecified_letters_by_word)
+        if (unspecified_letters_by_word && !remaining_letters.empty())
             unspecified_letters_by_word->push_back(remaining_letters);
     }
 }
 
 void WordSuggester::score_words_by_letter_scores(std::vector<std::string> const& unspecified_letters_by_word, std::vector<std::string> const& original_words, std::map<char, size_t> const& letter_count)
 {
+    if (this->_valid_answers_trimmed.size() == 1)
+    {
+        std::cout << "Final answer: " << this->_valid_answers_trimmed[0] << std::endl;
+        return;
+    }
+
     // std::map<std::string, size_t> scoring_words;
     std::map<size_t, std::string> scoring_words;
     for (size_t ii = 0; ii != unspecified_letters_by_word.size(); ++ii)
@@ -238,15 +244,16 @@ void WordSuggester::suggest()
     std::sort(unspecified_letters.begin(), unspecified_letters.end());
     std::map<char, size_t> letter_count;
     if (!unspecified_letters.empty())
-        letter_count[unspecified_letters[0]] = 1;
-    for (auto itr = unspecified_letters.begin(); itr != unspecified_letters.end() - 1; ++itr)
     {
-        if (*(itr + 1) == *itr)
-            ++letter_count[*itr];
-        else
-            letter_count[*(itr + 1)] = 1;
+        letter_count[unspecified_letters[0]] = 1;
+        for (auto itr = unspecified_letters.begin(); itr != unspecified_letters.end() - 1; ++itr)
+        {
+            if (*(itr + 1) == *itr)
+                ++letter_count[*itr];
+            else
+                letter_count[*(itr + 1)] = 1;
+        }
     }
-
     // Remove non-unique letters
     sort_and_remove_non_unique_elements(&unspecified_letters);
 
