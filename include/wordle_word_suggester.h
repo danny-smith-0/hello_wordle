@@ -1,8 +1,9 @@
 #ifndef WORDLE_WORD_SUGGESTER
 #define WORDLE_WORD_SUGGESTER
 
-#include <vector>
+#include <map>
 #include <string>
+#include <vector>
 
 namespace wordle
 {
@@ -29,11 +30,18 @@ namespace wordle
         size_t remove_words_without_letter(char required_letter);
         size_t remove_words_without_letter_index(char required_letter, size_t index);
 
+        // for suggesting
+        void subtract_required_letters(std::vector<std::string> const& words, std::string required_letters, std::string* unspecified_letters, std::vector<std::string>* unspecified_letters_by_word);
+        void score_words_by_letter_scores(std::vector<std::string> const& unspecified_letters_by_word, std::vector<std::string> const& original_words, std::map<char, size_t> const& letter_count);
+
         // variables
-        std::vector<std::string> _valid_answers;
-        std::vector<std::string> _valid_guesses;
+        std::vector<std::string> _valid_answers_orig;    // As loaded from file
+        std::vector<std::string> _valid_answers_trimmed;         // Allows removing
+        std::vector<std::string> _valid_guesses_orig;         // As loaded from file
+        std::vector<std::string> _valid_guesses_trimmed; // Allows removing
 
         std::string _required_letters;
+        std::string _excluded_letters;
     };
 }
 
