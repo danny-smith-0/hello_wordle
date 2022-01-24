@@ -307,6 +307,46 @@ void WordSuggester::suggest()
     */
 }
 
+double WordSuggester::how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words)
+{
+    std::vector<std::string> color_results (words.size(), "");
+
+    for (size_t word_index = 0; word_index < words.size(); ++word_index)
+    {
+        std::string word = words[word_index];
+        for (size_t guess_index = 0; guess_index < guess.size(); ++guess_index)
+        {
+            char guess_letter = guess[guess_index];
+            if (word.find(guess_letter) == std::string::npos) // not in the word
+                color_results[word_index] += "k";
+            else if (word[guess_index] == guess_letter)  // in the exact same spot
+                color_results[word_index] += "g";
+            else                                  // in the wrong spot
+                color_results[word_index] += "y";
+        }
+    }
+
+    auto unique_results = color_results;
+    std::sort(unique_results.begin(), unique_results.end());
+    auto last_itr = std::unique(unique_results.begin(), unique_results.end());
+    unique_results.erase(last_itr, unique_results.end());
+
+    //average
+    double average_words_remaining = static_cast<double>(color_results.size()) / static_cast<double>(unique_results.size());
+
+    std::vector<size_t> counts;
+    for (auto uni_res : unique_results)
+    {
+        size_t count = 0;
+        for (auto any_res : color_results)
+            if (any_res == uni_res)
+                ++count;
+        counts.push_back(count);
+    }
+
+    return average_words_remaining;
+}
+
 int main()
 {
     std::cout << "Hello Wordle!\n";
@@ -318,6 +358,7 @@ int main()
     // word_suggester.yellow_letter('', );
 
 
+    // word_suggester.how_many_words_remain_after_guess("niche", word_suggester._valid_answers_trimmed);
 
     word_suggester.suggest();
 
