@@ -347,6 +347,27 @@ double WordSuggester::how_many_words_remain_after_guess(std::string guess, std::
     return average_words_remaining;
 }
 
+void WordSuggester::how_many_words_remain_after_guess()
+{
+    double cutoff = 3.9; // Needs changing per guess to make it usable. 18 is my cutoff for zero information. TODo Calculate this based off of best X values.
+
+    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
+    for (auto word : this->_valid_answers_trimmed)
+    {
+        double average_words_remaining = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
+        if (average_words_remaining < cutoff)
+            std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+    }
+
+    std::cout  << "\n\nguesses:\n";
+    for (auto word : this->_valid_guesses_orig)
+    {
+        double average_words_remaining = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
+        if (average_words_remaining < cutoff)
+            std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+    }
+}
+
 int main()
 {
     std::cout << "Hello Wordle!\n";
@@ -358,11 +379,9 @@ int main()
     // word_suggester.yellow_letter('', );
 
 
-    // word_suggester.how_many_words_remain_after_guess("niche", word_suggester._valid_answers_trimmed);
-
     word_suggester.suggest();
 
-    // word_suggester.print_words();
+    word_suggester.how_many_words_remain_after_guess();
 
     int c = 0;
     c++;

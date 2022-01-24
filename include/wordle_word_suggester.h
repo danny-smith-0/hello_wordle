@@ -21,6 +21,7 @@ namespace wordle
 
         void suggest();
 
+        void   how_many_words_remain_after_guess();
         double how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words);
 
     // private:
