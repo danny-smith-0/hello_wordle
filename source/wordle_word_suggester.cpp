@@ -232,6 +232,12 @@ void WordSuggester::score_words_by_letter_scores(std::vector<std::string> const&
 
 void WordSuggester::suggest()
 {
+    if (this->_valid_answers_trimmed.size() == 1)
+    {
+        std::cout << "\nFinal answer: " << this->_valid_answers_trimmed[0] << "\n\n";
+        return;
+    }
+
     // Get all the letters in the words that weren't required, grouped all together and by word
     std::string unspecified_letters = "";
     std::vector<std::string> unspecified_letters_by_word;
