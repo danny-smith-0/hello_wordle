@@ -238,6 +238,12 @@ void WordSuggester::suggest()
         return;
     }
 
+    if (this->_valid_answers_trimmed.size() == 2)
+    {
+        std::cout << "\nFlip a coin!\n" << this->_valid_answers_trimmed[0] << "\n" << this->_valid_answers_trimmed[1] << "\n\n";
+        return;
+    }
+
     // Get all the letters in the words that weren't required, grouped all together and by word
     std::string unspecified_letters = "";
     std::vector<std::string> unspecified_letters_by_word;
