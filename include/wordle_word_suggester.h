@@ -7,6 +7,7 @@
 
 namespace wordle
 {
+    typedef std::map<std::string, std::vector<std::string>> colors_with_answers_t;
 
     class WordSuggester
     {
@@ -21,8 +22,8 @@ namespace wordle
 
         void suggest();
 
-        void   how_many_words_remain_after_guess();
-        double how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words);
+        void                  how_many_words_remain_after_guess();
+        colors_with_answers_t how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words);
 
     // private:
         // functions

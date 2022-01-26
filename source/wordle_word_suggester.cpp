@@ -6,6 +6,8 @@
 #include <fstream>   // std::ifstream (and ofstream)
 #include <sstream>   // std::stringstream
 
+#include <set>
+
 using namespace wordle;
 
 
@@ -315,64 +317,89 @@ void WordSuggester::suggest()
     this->how_many_words_remain_after_guess();
 }
 
-double WordSuggester::how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words)
+colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words)
 {
-    std::vector<std::string> color_results (words.size(), "");
 
-    for (size_t word_index = 0; word_index < words.size(); ++word_index)
+    // Get the words that match with each color result
+    colors_with_answers_t words_by_results;
+
+    for (auto word : words)
     {
-        std::string word = words[word_index];
+        std::string color_res;
         for (size_t guess_index = 0; guess_index < guess.size(); ++guess_index)
         {
             char guess_letter = guess[guess_index];
             if (word.find(guess_letter) == std::string::npos) // not in the word
-                color_results[word_index] += "k";
+                color_res += "k";
             else if (word[guess_index] == guess_letter)  // in the exact same spot
-                color_results[word_index] += "g";
+                color_res += "g";
             else                                  // in the wrong spot
-                color_results[word_index] += "y";
+                color_res += "y";
         }
+        words_by_results[color_res].push_back(word);
     }
-
-    auto unique_results = color_results;
-    std::sort(unique_results.begin(), unique_results.end());
-    auto last_itr = std::unique(unique_results.begin(), unique_results.end());
-    unique_results.erase(last_itr, unique_results.end());
 
     //average
-    double average_words_remaining = static_cast<double>(color_results.size()) / static_cast<double>(unique_results.size());
+    double average_words_remaining = static_cast<double>(words.size()) / static_cast<double>(words_by_results.size());
 
-    std::vector<size_t> counts;
-    for (auto uni_res : unique_results)
-    {
-        size_t count = 0;
-        for (auto any_res : color_results)
-            if (any_res == uni_res)
-                ++count;
-        counts.push_back(count);
-    }
-
-    return average_words_remaining;
+    return words_by_results;
 }
+
+double get_average_bucket_size(colors_with_answers_t in)
+{
+    double total_elements = 0;
+    for (auto row : in)
+        total_elements += row.second.size();
+    return total_elements / static_cast<double>(in.size());
+}
+
+// TODO make this a tuple so I can include the results
+struct comparator
+{
+    template <typename T>
+    bool operator()(T const& l, T const& r) const
+    {
+        if (l.second != r.second)
+            return l.second < r.second;
+        return l.first < r.first;
+    }
+};
 
 void WordSuggester::how_many_words_remain_after_guess()
 {
-    double cutoff = 3.9; // Needs changing per guess to make it usable. 18 is my cutoff for zero information. TODo Calculate this based off of best X values.
-
     std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
+
+    // TODO refactor These next two blocks
+    std::map<std::string, double> answer_average_result;
     for (auto word : this->_valid_answers_trimmed)
     {
-        double average_words_remaining = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
-        if (average_words_remaining < cutoff)
-            std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+        colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
+        answer_average_result[word] = get_average_bucket_size(words_by_results);
+    }
+    std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_average_result.begin(), answer_average_result.end());
+    int count = 0;
+    static constexpr int count_cutoff = 20;
+    for (auto [word, average_words_remaining] : answers_ordered)
+    {
+        std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+        if (count++ >= count_cutoff)
+            break;
     }
 
     std::cout  << "\n\nguesses:\n";
+    std::map<std::string, double> guess_average_result;
     for (auto word : this->_valid_guesses_orig)
     {
-        double average_words_remaining = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
-        if (average_words_remaining < cutoff)
-            std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+        colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
+        guess_average_result[word] = get_average_bucket_size(words_by_results);
+    }
+    std::set<std::pair<std::string, double>, comparator> guesses_ordered(guess_average_result.begin(), guess_average_result.end());
+    count = 0;
+    for (auto [word, average_words_remaining] : guesses_ordered)
+    {
+        std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+        if (count++ >= count_cutoff)
+            break;
     }
 }
 
