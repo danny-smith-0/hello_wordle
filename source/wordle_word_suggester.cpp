@@ -311,6 +311,8 @@ void WordSuggester::suggest()
     So far I haven't been considering location of the letters after the initial removing, before this function. That will affect how to get info.
     Compare all guess words, see which have the min, max, and average number of remaining words across the guess and all remaining valid answers
     */
+
+    this->how_many_words_remain_after_guess();
 }
 
 double WordSuggester::how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words)
@@ -386,8 +388,6 @@ int main()
 
 
     word_suggester.suggest();
-
-    word_suggester.how_many_words_remain_after_guess();
 
     int c = 0;
     c++;
