@@ -226,7 +226,7 @@ void WordSuggester::score_words_by_letter_scores(std::vector<std::string> const&
         }
     }
     if ( count >= word_print_cutoff)
-        std::cout << " Printed only " << word_print_cutoff << " of " << count << " words\n";
+        std::cout << " Printed only " << word_print_cutoff << " of " << original_words.size() << " words\n";
     std::cout << "\n";
 }
 
