@@ -353,6 +353,14 @@ double get_average_bucket_size(colors_with_answers_t in)
     return total_elements / static_cast<double>(in.size());
 }
 
+size_t max_bucket_size(colors_with_answers_t in)
+{
+    size_t max_bucket_size = 0;
+    for (auto row : in)
+        max_bucket_size = std::max(row.second.size(), max_bucket_size);
+    return max_bucket_size;
+}
+
 // TODO make this a tuple so I can include the results
 struct comparator
 {
@@ -371,33 +379,37 @@ void WordSuggester::how_many_words_remain_after_guess()
 
     // TODO refactor These next two blocks
     std::map<std::string, double> answer_average_result;
+    std::map<std::string, colors_with_answers_t> answer_all_results;
     for (auto word : this->_valid_answers_trimmed)
     {
         colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
         answer_average_result[word] = get_average_bucket_size(words_by_results);
+        answer_all_results[word] = words_by_results;
     }
     std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_average_result.begin(), answer_average_result.end());
     int count = 0;
     static constexpr int count_cutoff = 20;
     for (auto [word, average_words_remaining] : answers_ordered)
     {
-        std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_results[word]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
 
     std::cout  << "\n\nguesses:\n";
     std::map<std::string, double> guess_average_result;
+    std::map<std::string, colors_with_answers_t> guess_all_results;
     for (auto word : this->_valid_guesses_orig)
     {
         colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
         guess_average_result[word] = get_average_bucket_size(words_by_results);
+        guess_all_results[word] = words_by_results;
     }
     std::set<std::pair<std::string, double>, comparator> guesses_ordered(guess_average_result.begin(), guess_average_result.end());
     count = 0;
     for (auto [word, average_words_remaining] : guesses_ordered)
     {
-        std::cout << "    " << word << " :: " << average_words_remaining << "\n";
+        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(guess_all_results[word]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
