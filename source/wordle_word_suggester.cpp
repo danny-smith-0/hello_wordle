@@ -85,6 +85,14 @@ void WordSuggester::black_letter(char letter)
     this->remove_words_with_letter(letter);
 }
 
+void WordSuggester::black_duplicate_letter(char letter, size_t green_index)
+{
+    if (green_index != 0) this->remove_words_with_letter_index(letter, 0);
+    if (green_index != 1) this->remove_words_with_letter_index(letter, 1);
+    if (green_index != 2) this->remove_words_with_letter_index(letter, 2);
+    if (green_index != 3) this->remove_words_with_letter_index(letter, 3);
+    if (green_index != 4) this->remove_words_with_letter_index(letter, 4);
+}
 
 void WordSuggester::green_letter(char letter, size_t correct_index)
 {
