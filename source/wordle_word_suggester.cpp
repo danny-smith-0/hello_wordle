@@ -329,12 +329,44 @@ colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::stri
         for (size_t guess_index = 0; guess_index < guess.size(); ++guess_index)
         {
             char guess_letter = guess[guess_index];
+
             if (word.find(guess_letter) == std::string::npos) // not in the word
                 color_res += "k";
-            else if (word[guess_index] == guess_letter)  // in the exact same spot
-                color_res += "g";
-            else                                  // in the wrong spot
-                color_res += "y";
+            else
+            {
+                if (word[guess_index] == guess_letter)  // in the exact same spot
+                    color_res += "g";
+                else
+                {
+                    // Handle duplicates
+                    if (std::count(guess.begin(), guess.end(), guess_letter) > 1)
+                    {
+                        //if I'm first, and the other one is not green, I get to be yellow
+                        //if I'm first, and the second one is green, I'm yellow if there are two, or black if there is one
+                        //if I'm second, there must be duplicates in the word.
+
+                        //am I first?
+                        bool i_am_first = guess_index == guess.find_first_of(guess_letter);
+                        bool word_has_duplicates = std::count(word.begin(), word.end(), guess_letter) > 1;
+                        bool my_duplicate_is_green = word[guess.find_last_of(guess_letter)] == guess_letter;
+                        if (i_am_first && !my_duplicate_is_green)
+                        {
+                            color_res += "y"; // in the wrong spot
+                        }
+                        else
+                        {
+                            if (word_has_duplicates)
+                                color_res += "y"; // in the wrong spot
+                            else
+                                color_res += "k";
+                        }
+                    }
+                    else
+                    {
+                        color_res += "y"; // in the wrong spot
+                    }
+                }
+            }
         }
         words_by_results[color_res].push_back(word);
     }
