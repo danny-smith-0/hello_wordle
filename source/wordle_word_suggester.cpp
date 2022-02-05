@@ -401,6 +401,19 @@ size_t max_bucket_size(colors_with_answers_t in)
     return max_bucket_size;
 }
 
+std::string buckets(colors_with_answers_t in)
+{
+    size_t max_buckets = 15;
+    std::stringstream out;
+    if (in.size() > max_buckets)
+        out << "total buckets: " << max_buckets;
+    else
+        for (auto row : in)
+            out << "_" << row.second.size();
+    return out.str();
+}
+
+
 // TODO make this a tuple so I can include the results
 struct comparator
 {
@@ -431,7 +444,8 @@ void WordSuggester::how_many_words_remain_after_guess()
     static constexpr int count_cutoff = 20;
     for (auto [word, average_words_remaining] : answers_ordered)
     {
-        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_results[word]) << "\n";
+        std::cout << "    " << word << " :: average bucket: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_results[word])
+                << ",  " << buckets(answer_all_results[word]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
@@ -449,7 +463,8 @@ void WordSuggester::how_many_words_remain_after_guess()
     count = 0;
     for (auto [word, average_words_remaining] : guesses_ordered)
     {
-        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(guess_all_results[word]) << "\n";
+        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(guess_all_results[word])
+                << ",  " << buckets(guess_all_results[word]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
