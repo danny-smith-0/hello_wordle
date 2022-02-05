@@ -7,6 +7,7 @@
 
 namespace wordle
 {
+    typedef std::map<std::string, std::vector<std::string>> colors_with_answers_t;
 
     class WordSuggester
     {
@@ -16,10 +17,14 @@ namespace wordle
         void print_words(int words_per_row = 1, std::vector<std::string> words = std::vector<std::string>());
 
         void black_letter(char letter);
+        void black_duplicate_letter(char letter, size_t green_index);
         void green_letter(char letter, size_t correct_index);
         void yellow_letter(char letter, size_t wrong_index);
 
         void suggest();
+
+        void                  how_many_words_remain_after_guess();
+        colors_with_answers_t how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words);
 
     // private:
         // functions
