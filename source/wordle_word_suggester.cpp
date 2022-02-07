@@ -302,10 +302,10 @@ void WordSuggester::suggest()
     std::cout << "\n" << ss.str() << "\n\n";
 
     // Score the remaining words by popular letter - easy first pass for a score
-    std::cout << "valid answers: \n";
-    score_words_by_letter_scores(unspecified_letters_by_word, this->_valid_answers_trimmed, letter_count);
-    std::cout << "valid guesses (invalid answers): \n";
-    score_words_by_letter_scores(unspecified_letters_by_word__guesses, this->_valid_guesses_orig, letter_count);
+    // std::cout << "valid answers: \n";
+    // score_words_by_letter_scores(unspecified_letters_by_word, this->_valid_answers_trimmed, letter_count);
+    // std::cout << "valid guesses (invalid answers): \n";
+    // score_words_by_letter_scores(unspecified_letters_by_word__guesses, this->_valid_guesses_orig, letter_count);
 
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
