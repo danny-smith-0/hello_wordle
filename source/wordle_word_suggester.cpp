@@ -99,52 +99,27 @@ void WordSuggester::green_letter(char letter, size_t correct_index)
     this->remove_words_without_letter_index(letter, correct_index);
 }
 
-void WordSuggester::yellow_letter(char letter, size_t wrong_index)
+void WordSuggester::yellow_letter(char letter, size_t wrong_index, bool is_duplicate)
 {
-    this->remove_words_without_letter(letter);
-
+    this->remove_words_without_letter(letter, is_duplicate);
     this->remove_words_with_letter_index(letter, wrong_index);
 }
 
-void WordSuggester::yellow_duplicate_letter(char letter, size_t wrong_index)
-{
-    this->remove_words_without_duplicate_letter(letter);
-    this->remove_words_with_letter_index(letter, wrong_index);
-}
-
-void WordSuggester::remove_words_without_duplicate_letter(char required_letter)
-{
-    for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
-    {
-        size_t pos1 = itr->find(required_letter);
-        size_t pos2 = itr->find(required_letter, pos1 + 1);
-        if (pos2 == std::string::npos)
-            itr = _valid_answers_trimmed.erase(itr);
-        else
-            ++itr;
-    }
-}
-
-size_t WordSuggester::remove_words_without_letter(char required_letter)
+size_t WordSuggester::remove_words_without_letter(char required_letter, bool duplicate)
 {
     if (_required_letters.find(required_letter) == std::string::npos)
         _required_letters += required_letter;
 
     for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
-        if (itr->find(required_letter) == std::string::npos)
+        size_t pos =      itr->find(required_letter);
+        pos = duplicate ? itr->find(required_letter, pos + 1) : pos;
+        if (pos == std::string::npos)
             itr = _valid_answers_trimmed.erase(itr);
         else
             ++itr;
     }
 
-    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    // {
-    //     if (itr->find(required_letter) == std::string::npos)
-    //         itr = _valid_guesses_trimmed.erase(itr);
-    //     else
-    //         ++itr;
-    // }
     return _valid_answers_trimmed.size();
 }
 
@@ -495,6 +470,7 @@ int main()
     WordSuggester word_suggester;
     std::cout << "Libraries loaded.\n";
 
+    bool duplicate = true;
     // word_suggester.black_letter( '');
     // word_suggester.green_letter( '', );
     // word_suggester.yellow_letter('', );
