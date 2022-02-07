@@ -106,6 +106,25 @@ void WordSuggester::yellow_letter(char letter, size_t wrong_index)
     this->remove_words_with_letter_index(letter, wrong_index);
 }
 
+void WordSuggester::yellow_duplicate_letter(char letter, size_t wrong_index)
+{
+    this->remove_words_without_duplicate_letter(letter);
+    this->remove_words_with_letter_index(letter, wrong_index);
+}
+
+void WordSuggester::remove_words_without_duplicate_letter(char required_letter)
+{
+    for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
+    {
+        size_t pos1 = itr->find(required_letter);
+        size_t pos2 = itr->find(required_letter, pos1 + 1);
+        if (pos2 == std::string::npos)
+            itr = _valid_answers_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+}
+
 size_t WordSuggester::remove_words_without_letter(char required_letter)
 {
     if (_required_letters.find(required_letter) == std::string::npos)
