@@ -41,9 +41,8 @@ namespace wordle
 
         // variables
         std::vector<std::string> _valid_answers_orig;    // As loaded from file
-        std::vector<std::string> _valid_answers_trimmed;         // Allows removing
-        std::vector<std::string> _valid_guesses_orig;         // As loaded from file
-        std::vector<std::string> _valid_guesses_trimmed; // Allows removing
+        std::vector<std::string> _valid_answers_trimmed; // Allows removing
+        std::vector<std::string> _valid_guesses_orig;    // As loaded from file
 
         std::string _required_letters;
         std::string _excluded_letters;

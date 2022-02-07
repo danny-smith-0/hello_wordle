@@ -33,7 +33,6 @@ void WordSuggester::load_words()
         _valid_guesses_orig.push_back(line);
 
     _valid_answers_trimmed = _valid_answers_orig;
-    _valid_guesses_trimmed = _valid_guesses_orig;
 }
 
 size_t WordSuggester::remove_words_with_letter(char letter)
@@ -45,14 +44,6 @@ size_t WordSuggester::remove_words_with_letter(char letter)
     {
         if (itr->find(letter) != std::string::npos)
             itr = _valid_answers_trimmed.erase(itr);
-        else
-            ++itr;
-    }
-
-    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    {
-        if (itr->find(letter) != std::string::npos)
-            itr = _valid_guesses_trimmed.erase(itr);
         else
             ++itr;
     }
@@ -70,13 +61,6 @@ size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
             ++itr;
     }
 
-    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    // {
-    //     if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
-    //         itr = _valid_guesses_trimmed.erase(itr);
-    //     else
-    //         ++itr;
-    // }
     return _valid_answers_trimmed.size();
 }
 
@@ -135,14 +119,6 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
         else
             ++itr;
     }
-
-    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    // {
-    //     if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
-    //         itr = _valid_guesses_trimmed.erase(itr);
-    //     else
-    //         ++itr;
-    // }
 
     return _valid_answers_trimmed.size();
 }
