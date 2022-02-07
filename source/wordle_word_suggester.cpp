@@ -451,6 +451,18 @@ int main()
     // word_suggester.green_letter( '', );
     // word_suggester.yellow_letter('', );
 
+    word_suggester.black_letter( 's');
+    word_suggester.green_letter( 'l', 1);
+    word_suggester.black_letter( 'a');
+    word_suggester.black_letter( 't');
+    word_suggester.yellow_letter('e', 4);
+
+    word_suggester.black_letter( 'b');
+    word_suggester.green_letter( 'l', 1);
+    word_suggester.yellow_letter('e', 2, duplicate);
+    word_suggester.green_letter( 'e', 3);
+    word_suggester.yellow_letter('d', 4);
+
 
     word_suggester.suggest();
 
