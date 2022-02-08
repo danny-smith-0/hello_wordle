@@ -438,6 +438,10 @@ void WordSuggester::how_many_words_remain_after_guess()
         if (count++ >= count_cutoff)
             break;
     }
+
+    // A place for a break point
+    int c = 0;
+    c++;
 }
 
 int main()
