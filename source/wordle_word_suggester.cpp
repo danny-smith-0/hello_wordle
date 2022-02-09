@@ -376,7 +376,7 @@ std::string buckets(colors_with_answers_t in)
     size_t max_buckets = 15;
     std::stringstream out;
     if (in.size() > max_buckets)
-        out << "total buckets: " << max_buckets;
+        out << "total buckets: " << in.size();
     else
         for (auto row : in)
             out << "_" << row.second.size();
