@@ -398,7 +398,8 @@ struct comparator
 
 void WordSuggester::how_many_words_remain_after_guess()
 {
-    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
+    int num_answers = static_cast<int>(this->_valid_answers_trimmed.size());
+    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << num_answers << ")\n";
 
     // TODO refactor These next two blocks
     std::map<std::string, double> answer_average_result;
@@ -411,7 +412,7 @@ void WordSuggester::how_many_words_remain_after_guess()
     }
     std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_average_result.begin(), answer_average_result.end());
     int count = 0;
-    static constexpr int count_cutoff = 20;
+    int count_cutoff = num_answers > 30 ? 20 : num_answers;
     for (auto [word, average_words_remaining] : answers_ordered)
     {
         std::cout << "    " << word << " :: average bucket: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_results[word])
