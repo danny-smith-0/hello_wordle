@@ -33,7 +33,6 @@ void WordSuggester::load_words()
         _valid_guesses_orig.push_back(line);
 
     _valid_answers_trimmed = _valid_answers_orig;
-    _valid_guesses_trimmed = _valid_guesses_orig;
 }
 
 size_t WordSuggester::remove_words_with_letter(char letter)
@@ -45,14 +44,6 @@ size_t WordSuggester::remove_words_with_letter(char letter)
     {
         if (itr->find(letter) != std::string::npos)
             itr = _valid_answers_trimmed.erase(itr);
-        else
-            ++itr;
-    }
-
-    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    {
-        if (itr->find(letter) != std::string::npos)
-            itr = _valid_guesses_trimmed.erase(itr);
         else
             ++itr;
     }
@@ -70,13 +61,6 @@ size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
             ++itr;
     }
 
-    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    // {
-    //     if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
-    //         itr = _valid_guesses_trimmed.erase(itr);
-    //     else
-    //         ++itr;
-    // }
     return _valid_answers_trimmed.size();
 }
 
@@ -99,33 +83,27 @@ void WordSuggester::green_letter(char letter, size_t correct_index)
     this->remove_words_without_letter_index(letter, correct_index);
 }
 
-void WordSuggester::yellow_letter(char letter, size_t wrong_index)
+void WordSuggester::yellow_letter(char letter, size_t wrong_index, bool is_duplicate)
 {
-    this->remove_words_without_letter(letter);
-
+    this->remove_words_without_letter(letter, is_duplicate);
     this->remove_words_with_letter_index(letter, wrong_index);
 }
 
-size_t WordSuggester::remove_words_without_letter(char required_letter)
+size_t WordSuggester::remove_words_without_letter(char required_letter, bool duplicate)
 {
     if (_required_letters.find(required_letter) == std::string::npos)
         _required_letters += required_letter;
 
     for (auto itr = _valid_answers_trimmed.begin(); itr != _valid_answers_trimmed.end(); )
     {
-        if (itr->find(required_letter) == std::string::npos)
+        size_t pos =      itr->find(required_letter);
+        pos = duplicate ? itr->find(required_letter, pos + 1) : pos;
+        if (pos == std::string::npos)
             itr = _valid_answers_trimmed.erase(itr);
         else
             ++itr;
     }
 
-    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    // {
-    //     if (itr->find(required_letter) == std::string::npos)
-    //         itr = _valid_guesses_trimmed.erase(itr);
-    //     else
-    //         ++itr;
-    // }
     return _valid_answers_trimmed.size();
 }
 
@@ -141,14 +119,6 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
         else
             ++itr;
     }
-
-    // for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
-    // {
-    //     if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
-    //         itr = _valid_guesses_trimmed.erase(itr);
-    //     else
-    //         ++itr;
-    // }
 
     return _valid_answers_trimmed.size();
 }
@@ -308,10 +278,10 @@ void WordSuggester::suggest()
     std::cout << "\n" << ss.str() << "\n\n";
 
     // Score the remaining words by popular letter - easy first pass for a score
-    std::cout << "valid answers: \n";
-    score_words_by_letter_scores(unspecified_letters_by_word, this->_valid_answers_trimmed, letter_count);
-    std::cout << "valid guesses (invalid answers): \n";
-    score_words_by_letter_scores(unspecified_letters_by_word__guesses, this->_valid_guesses_orig, letter_count);
+    // std::cout << "valid answers: \n";
+    // score_words_by_letter_scores(unspecified_letters_by_word, this->_valid_answers_trimmed, letter_count);
+    // std::cout << "valid guesses (invalid answers): \n";
+    // score_words_by_letter_scores(unspecified_letters_by_word__guesses, this->_valid_guesses_orig, letter_count);
 
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
@@ -339,11 +309,11 @@ colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::stri
             char guess_letter = guess[guess_index];
 
             if (word.find(guess_letter) == std::string::npos) // not in the word
-                color_res += "k";
+                color_res += "B";
             else
             {
                 if (word[guess_index] == guess_letter)  // in the exact same spot
-                    color_res += "g";
+                    color_res += "G";
                 else
                 {
                     // Handle duplicates
@@ -359,19 +329,19 @@ colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::stri
                         bool my_duplicate_is_green = word[guess.find_last_of(guess_letter)] == guess_letter;
                         if (i_am_first && !my_duplicate_is_green)
                         {
-                            color_res += "y"; // in the wrong spot
+                            color_res += "Y"; // in the wrong spot
                         }
                         else
                         {
                             if (word_has_duplicates)
-                                color_res += "y"; // in the wrong spot
+                                color_res += "Y"; // in the wrong spot
                             else
-                                color_res += "k";
+                                color_res += "B";
                         }
                     }
                     else
                     {
-                        color_res += "y"; // in the wrong spot
+                        color_res += "Y"; // in the wrong spot
                     }
                 }
             }
@@ -406,7 +376,7 @@ std::string buckets(colors_with_answers_t in)
     size_t max_buckets = 15;
     std::stringstream out;
     if (in.size() > max_buckets)
-        out << "total buckets: " << max_buckets;
+        out << "total buckets: " << in.size();
     else
         for (auto row : in)
             out << "_" << row.second.size();
@@ -428,7 +398,8 @@ struct comparator
 
 void WordSuggester::how_many_words_remain_after_guess()
 {
-    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
+    int num_answers = static_cast<int>(this->_valid_answers_trimmed.size());
+    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << num_answers << ")\n";
 
     // TODO refactor These next two blocks
     std::map<std::string, double> answer_average_result;
@@ -441,7 +412,7 @@ void WordSuggester::how_many_words_remain_after_guess()
     }
     std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_average_result.begin(), answer_average_result.end());
     int count = 0;
-    static constexpr int count_cutoff = 20;
+    int count_cutoff = num_answers > 30 ? 20 : num_answers;
     for (auto [word, average_words_remaining] : answers_ordered)
     {
         std::cout << "    " << word << " :: average bucket: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_results[word])
@@ -468,6 +439,10 @@ void WordSuggester::how_many_words_remain_after_guess()
         if (count++ >= count_cutoff)
             break;
     }
+
+    // A place for a break point
+    int c = 0;
+    c++;
 }
 
 int main()
@@ -476,6 +451,7 @@ int main()
     WordSuggester word_suggester;
     std::cout << "Libraries loaded.\n";
 
+    bool duplicate = true;
     // word_suggester.black_letter( '');
     // word_suggester.green_letter( '', );
     // word_suggester.yellow_letter('', );

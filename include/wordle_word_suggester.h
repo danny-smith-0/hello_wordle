@@ -19,7 +19,7 @@ namespace wordle
         void black_letter(char letter);
         void black_duplicate_letter(char letter, size_t green_index);
         void green_letter(char letter, size_t correct_index);
-        void yellow_letter(char letter, size_t wrong_index);
+        void yellow_letter(char letter, size_t wrong_index, bool is_duplicate = false);
 
         void suggest();
 
@@ -32,7 +32,7 @@ namespace wordle
 
         size_t remove_words_with_letter(char letter);
         size_t remove_words_with_letter_index(char letter, size_t index);
-        size_t remove_words_without_letter(char required_letter);
+        size_t remove_words_without_letter(char required_letter, bool duplicate = false);
         size_t remove_words_without_letter_index(char required_letter, size_t index);
 
         // for suggesting
@@ -41,9 +41,8 @@ namespace wordle
 
         // variables
         std::vector<std::string> _valid_answers_orig;    // As loaded from file
-        std::vector<std::string> _valid_answers_trimmed;         // Allows removing
-        std::vector<std::string> _valid_guesses_orig;         // As loaded from file
-        std::vector<std::string> _valid_guesses_trimmed; // Allows removing
+        std::vector<std::string> _valid_answers_trimmed; // Allows removing
+        std::vector<std::string> _valid_guesses_orig;    // As loaded from file
 
         std::string _required_letters;
         std::string _excluded_letters;
