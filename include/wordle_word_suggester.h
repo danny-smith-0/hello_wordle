@@ -15,6 +15,7 @@ namespace wordle
         static constexpr size_t _max_index = 4;
         WordSuggester::WordSuggester() { this->load_words(); }
         void print_words(int words_per_row = 1, std::vector<std::string> words = std::vector<std::string>());
+        std::string print_buckets(colors_with_answers_t const& results);
 
         void black_letter(char letter);
         void black_duplicate_letter(char letter, size_t green_index);

@@ -408,6 +408,8 @@ void WordSuggester::how_many_words_remain_after_guess()
     {
         colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
         answer_average_result[word] = get_average_bucket_size(words_by_results);
+        if (num_answers < 20)
+            std::cout << word << "\n" << print_buckets(words_by_results);// << "\n";
         answer_all_results[word] = words_by_results;
     }
     std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_average_result.begin(), answer_average_result.end());
@@ -443,6 +445,19 @@ void WordSuggester::how_many_words_remain_after_guess()
     // A place for a break point
     int c = 0;
     c++;
+}
+
+std::string WordSuggester::print_buckets(colors_with_answers_t const& buckets)
+{
+    std::stringstream ss;
+    for ( auto [color, bucket] : buckets)
+    {
+        ss << color;
+        for (auto word : bucket)
+            ss << "," << word;
+        ss << "\n";
+    }
+    return ss.str();
 }
 
 int main()
