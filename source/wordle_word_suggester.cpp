@@ -309,11 +309,11 @@ colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::stri
             char guess_letter = guess[guess_index];
 
             if (word.find(guess_letter) == std::string::npos) // not in the word
-                color_res += "k";
+                color_res += "B";
             else
             {
                 if (word[guess_index] == guess_letter)  // in the exact same spot
-                    color_res += "g";
+                    color_res += "G";
                 else
                 {
                     // Handle duplicates
@@ -329,19 +329,19 @@ colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::stri
                         bool my_duplicate_is_green = word[guess.find_last_of(guess_letter)] == guess_letter;
                         if (i_am_first && !my_duplicate_is_green)
                         {
-                            color_res += "y"; // in the wrong spot
+                            color_res += "Y"; // in the wrong spot
                         }
                         else
                         {
                             if (word_has_duplicates)
-                                color_res += "y"; // in the wrong spot
+                                color_res += "Y"; // in the wrong spot
                             else
-                                color_res += "k";
+                                color_res += "B";
                         }
                     }
                     else
                     {
-                        color_res += "y"; // in the wrong spot
+                        color_res += "Y"; // in the wrong spot
                     }
                 }
             }
