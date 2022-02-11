@@ -469,6 +469,66 @@ std::string WordSuggester::print_buckets(colored_buckets_t const& colored_bucket
     return ss.str();
 }
 
+bool check_anagram(std::string s1, std::string s2)
+{
+    if (s1 == s2)
+        return false;
+
+    std::sort(s1.begin(), s1.end());
+    std::sort(s2.begin(), s2.end());
+
+    return s1 == s2;
+
+}
+
+std::vector<words_t> find_anagrams(words_t words)
+{
+    std::vector<words_t> anagram_sets;
+    for (auto itr1 = words.begin(); itr1 != words.end() - 1; )
+    {
+        words_t set(1, *itr1);
+        for (auto itr2 = itr1 + 1; itr2 != words.end(); )
+        {
+            if (check_anagram(*itr1, *itr2))
+            {
+                set.push_back(*itr2);
+                itr2 = words.erase(itr2);
+                // Since itr1 precedes itr2 in all cases, itr1 is still valid
+            }
+            else
+                ++itr2;
+        }
+        if (set.size() > 1)
+        {
+            anagram_sets.push_back(set);
+            ++itr1;
+            // Print progress (the larger sets take awhile)
+            if (anagram_sets.size() % 100 == 0)
+                std::cout << anagram_sets.size() << "\n";
+        }
+        else
+            itr1 = words.erase(itr1);
+    }
+    return anagram_sets;
+}
+
+void print_anagrams(std::vector<words_t> anagram_sets)
+{
+    std::stringstream ss;
+    std::cout << "Total sets: " << anagram_sets.size();
+    size_t max_set = 0;
+    size_t total_words = 0;
+    for (auto set : anagram_sets)
+    {
+        max_set = std::max(max_set, set.size());
+        total_words += set.size();
+        for (auto word : set)
+            ss << word << " ";
+        ss << "\n";
+    }
+    std::cout << ", max set: " << max_set << ", total words: " << total_words << "\n" << ss.str() << std::endl;
+}
+
 int main()
 {
     std::cout << "Hello Wordle!\n";
@@ -480,9 +540,18 @@ int main()
     // word_suggester.green_letter( '', );
     // word_suggester.yellow_letter('', );
 
+    std::vector<words_t> answer_anagrams = find_anagrams(word_suggester._valid_answers_orig);
+    print_anagrams(answer_anagrams);
 
+    std::vector<words_t> guess_anagrams  = find_anagrams(word_suggester._valid_guesses_orig);
+    print_anagrams(guess_anagrams);
 
-    word_suggester.suggest();
+    bucket_t both(word_suggester._valid_answers_orig.begin(), word_suggester._valid_answers_orig.end());
+    both.insert(both.end(), word_suggester._valid_guesses_orig.begin(), word_suggester._valid_guesses_orig.end());
+    auto both_anagrams = find_anagrams(both);
+    print_anagrams(both_anagrams);
+
+    // word_suggester.suggest();
 
     int c = 0;
     c++;
