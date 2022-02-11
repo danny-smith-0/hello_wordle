@@ -7,7 +7,10 @@
 
 namespace wordle
 {
-    typedef std::map<std::string, std::vector<std::string>> colors_with_answers_t;
+    typedef std::vector<std::string> bucket_t;
+    typedef std::vector<std::string> words_t;
+    // Each bucket of possible answers is painted with five ordered colors, the key-string of this map
+    typedef std::map<std::string, bucket_t> colored_buckets_t;
 
     class WordSuggester
     {
@@ -15,7 +18,7 @@ namespace wordle
         static constexpr size_t _max_index = 4;
         WordSuggester::WordSuggester() { this->load_words(); }
         void print_words(int words_per_row = 1, std::vector<std::string> words = std::vector<std::string>());
-        std::string print_buckets(colors_with_answers_t const& results);
+        std::string print_buckets(colored_buckets_t const& results);
 
         void black_letter(char letter);
         void black_duplicate_letter(char letter, size_t green_index);
@@ -24,8 +27,8 @@ namespace wordle
 
         void suggest();
 
-        void                  how_many_words_remain_after_guess();
-        colors_with_answers_t how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words);
+        void              calc_buckets();
+        colored_buckets_t calc_buckets(std::string guess, std::vector<std::string> words);
 
     // private:
         // functions

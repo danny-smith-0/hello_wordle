@@ -292,14 +292,14 @@ void WordSuggester::suggest()
     Compare all guess words, see which have the min, max, and average number of remaining words across the guess and all remaining valid answers
     */
 
-    this->how_many_words_remain_after_guess();
+    this->calc_buckets();
 }
 
-colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::string guess, std::vector<std::string> words)
+colored_buckets_t WordSuggester::calc_buckets(std::string guess, std::vector<std::string> words)
 {
 
     // Get the words that match with each color result
-    colors_with_answers_t words_by_results;
+    colored_buckets_t colored_buckets;
 
     for (auto word : words)
     {
@@ -346,16 +346,16 @@ colors_with_answers_t WordSuggester::how_many_words_remain_after_guess(std::stri
                 }
             }
         }
-        words_by_results[color_res].push_back(word);
+        colored_buckets[color_res].push_back(word);
     }
 
     //average
-    double average_words_remaining = static_cast<double>(words.size()) / static_cast<double>(words_by_results.size());
+    double average_words_remaining = static_cast<double>(words.size()) / static_cast<double>(colored_buckets.size());
 
-    return words_by_results;
+    return colored_buckets;
 }
 
-double get_average_bucket_size(colors_with_answers_t in)
+double get_average_bucket_size(colored_buckets_t in)
 {
     double total_elements = 0;
     for (auto row : in)
@@ -363,7 +363,7 @@ double get_average_bucket_size(colors_with_answers_t in)
     return total_elements / static_cast<double>(in.size());
 }
 
-size_t max_bucket_size(colors_with_answers_t in)
+size_t max_bucket_size(colored_buckets_t in)
 {
     size_t max_bucket_size = 0;
     for (auto row : in)
@@ -371,7 +371,7 @@ size_t max_bucket_size(colors_with_answers_t in)
     return max_bucket_size;
 }
 
-std::string buckets(colors_with_answers_t in)
+std::string bucket_depth_str(colored_buckets_t in)
 {
     size_t max_buckets = 15;
     std::stringstream out;
@@ -396,48 +396,48 @@ struct comparator
     }
 };
 
-void WordSuggester::how_many_words_remain_after_guess()
+void WordSuggester::calc_buckets()
 {
     int num_answers = static_cast<int>(this->_valid_answers_trimmed.size());
     std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << num_answers << ")\n";
 
     // TODO refactor These next two blocks
-    std::map<std::string, double> answer_average_result;
-    std::map<std::string, colors_with_answers_t> answer_all_results;
+    std::map<std::string, double> answer_avg_bucket_size;
+    std::map<std::string, colored_buckets_t> answer_all_buckets;
     for (auto word : this->_valid_answers_trimmed)
     {
-        colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
-        answer_average_result[word] = get_average_bucket_size(words_by_results);
+        colored_buckets_t colored_buckets = this->calc_buckets(word, this->_valid_answers_trimmed);
+        answer_avg_bucket_size[word] = get_average_bucket_size(colored_buckets);
         if (num_answers < 20)
-            std::cout << word << "\n" << print_buckets(words_by_results);// << "\n";
-        answer_all_results[word] = words_by_results;
+            std::cout << word << "\n" << print_buckets(colored_buckets);// << "\n";
+        answer_all_buckets[word] = colored_buckets;
     }
-    std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_average_result.begin(), answer_average_result.end());
+    std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_avg_bucket_size.begin(), answer_avg_bucket_size.end());
     int count = 0;
     int count_cutoff = num_answers > 30 ? 20 : num_answers;
     for (auto [word, average_words_remaining] : answers_ordered)
     {
-        std::cout << "    " << word << " :: average bucket: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_results[word])
-                << ",  " << buckets(answer_all_results[word]) << "\n";
+        std::cout << "    " << word << " :: average bucket: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_buckets[word])
+                << ",  " << bucket_depth_str(answer_all_buckets[word]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
 
-    std::cout  << "\n\nguesses:\n";
-    std::map<std::string, double> guess_average_result;
-    std::map<std::string, colors_with_answers_t> guess_all_results;
+     std::cout  << "\n\nguesses:\n";
+    std::map<std::string, double> guess_avg_bucket_size;
+    std::map<std::string, colored_buckets_t> guess_all_buckets;
     for (auto word : this->_valid_guesses_orig)
     {
-        colors_with_answers_t words_by_results = this->how_many_words_remain_after_guess(word, this->_valid_answers_trimmed);
-        guess_average_result[word] = get_average_bucket_size(words_by_results);
-        guess_all_results[word] = words_by_results;
+        colored_buckets_t colored_buckets = this->calc_buckets(word, this->_valid_answers_trimmed);
+        guess_avg_bucket_size[word] = get_average_bucket_size(colored_buckets);
+        guess_all_buckets[word] = colored_buckets;
     }
-    std::set<std::pair<std::string, double>, comparator> guesses_ordered(guess_average_result.begin(), guess_average_result.end());
+    std::set<std::pair<std::string, double>, comparator> guesses_ordered(guess_avg_bucket_size.begin(), guess_avg_bucket_size.end());
     count = 0;
     for (auto [word, average_words_remaining] : guesses_ordered)
     {
-        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(guess_all_results[word])
-                << ",  " << buckets(guess_all_results[word]) << "\n";
+        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(guess_all_buckets[word])
+                << ",  " << bucket_depth_str(guess_all_buckets[word]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
@@ -447,10 +447,10 @@ void WordSuggester::how_many_words_remain_after_guess()
     c++;
 }
 
-std::string WordSuggester::print_buckets(colors_with_answers_t const& buckets)
+std::string WordSuggester::print_buckets(colored_buckets_t const& colored_buckets)
 {
     std::stringstream ss;
-    for ( auto [color, bucket] : buckets)
+    for ( auto [color, bucket] : colored_buckets)
     {
         ss << color;
         for (auto word : bucket)
@@ -470,6 +470,7 @@ int main()
     // word_suggester.black_letter( '');
     // word_suggester.green_letter( '', );
     // word_suggester.yellow_letter('', );
+
 
 
     word_suggester.suggest();
