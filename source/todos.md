@@ -5,3 +5,4 @@
 - TODO If necessary, make code handle triplicate letters.
 - TODO refactor `calc_buckets()`
 - TODO Break the code into different files, potentially refactoring into separate classes
+- TODO BUG. Black duplicate assumes that I have a green. Need black duplicate for a yellow.
