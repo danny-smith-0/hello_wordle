@@ -17,7 +17,7 @@ namespace wordle
     public:
         static constexpr size_t _max_index = 4;
         WordSuggester::WordSuggester() { this->load_words(); }
-        void print_words(int words_per_row = 1, std::vector<std::string> words = std::vector<std::string>());
+        void print_words(int words_per_row = 1, words_t words = words_t());
         std::string print_buckets(colored_buckets_t const& results);
 
         void black_letter(char letter);
@@ -28,7 +28,7 @@ namespace wordle
         void suggest();
 
         void              calc_buckets();
-        colored_buckets_t calc_buckets(std::string guess, std::vector<std::string> words);
+        colored_buckets_t calc_buckets(std::string guess, words_t words);
 
     // private:
         // functions
@@ -40,13 +40,13 @@ namespace wordle
         size_t remove_words_without_letter_index(char required_letter, size_t index);
 
         // for suggesting
-        void subtract_required_letters(std::vector<std::string> const& words, std::string required_letters, std::string* unspecified_letters, std::vector<std::string>* unspecified_letters_by_word);
-        void score_words_by_letter_scores(std::vector<std::string> const& unspecified_letters_by_word, std::vector<std::string> const& original_words, std::map<char, size_t> const& letter_count);
+        void subtract_required_letters(words_t const& words, std::string required_letters, std::string* unspecified_letters, words_t* unspecified_letters_by_word);
+        void score_words_by_letter_scores(words_t const& unspecified_letters_by_word, words_t const& original_words, std::map<char, size_t> const& letter_count);
 
         // variables
-        std::vector<std::string> _valid_answers_orig;    // As loaded from file
-        std::vector<std::string> _valid_answers_trimmed; // Allows removing
-        std::vector<std::string> _valid_guesses_orig;    // As loaded from file
+        words_t _valid_answers_orig;    // As loaded from file
+        words_t _valid_answers_trimmed; // Allows removing
+        words_t _valid_guesses_orig;    // As loaded from file
 
         std::string _required_letters;
         std::string _excluded_letters;
