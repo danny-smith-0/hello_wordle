@@ -27,7 +27,8 @@ namespace wordle
 
         void suggest();
 
-        void              calc_buckets();
+        void collect_buckets();
+        std::map<std::string, colored_buckets_t> collect_buckets(words_t words);
         colored_buckets_t calc_buckets(std::string guess, words_t words);
 
     // private:

@@ -292,7 +292,7 @@ void WordSuggester::suggest()
     Compare all guess words, see which have the min, max, and average number of remaining words across the guess and all remaining valid answers
     */
 
-    this->calc_buckets();
+    this->collect_buckets();
 }
 
 colored_buckets_t WordSuggester::calc_buckets(std::string guess, std::vector<std::string> words)
@@ -373,13 +373,22 @@ size_t max_bucket_size(colored_buckets_t in)
 
 std::string bucket_depth_str(colored_buckets_t in)
 {
-    size_t max_buckets = 15;
+    size_t max_buckets = 20;
     std::stringstream out;
-    if (in.size() > max_buckets)
-        out << "total buckets: " << in.size();
-    else
+    if (in.size() <= max_buckets)
+    {
+        std::vector<size_t> bucket_depths;
         for (auto row : in)
-            out << "_" << row.second.size();
+            bucket_depths.push_back(row.second.size());
+
+        std::sort(bucket_depths.begin(), bucket_depths.end(), std::greater<size_t>());
+        for (auto itr_depth = bucket_depths.begin(); itr_depth != bucket_depths.end(); ++itr_depth)
+        {
+            out << *itr_depth;
+            if (itr_depth != bucket_depths.end() - 1)
+                out << ",";
+        }
+    }
     return out.str();
 }
 
@@ -396,51 +405,51 @@ struct comparator
     }
 };
 
-void WordSuggester::calc_buckets()
+std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t guess_words)
 {
     int num_answers = static_cast<int>(this->_valid_answers_trimmed.size());
-    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << num_answers << ")\n";
 
-    // TODO refactor These next two blocks
-    std::map<std::string, double> answer_avg_bucket_size;
-    std::map<std::string, colored_buckets_t> answer_all_buckets;
-    for (auto word : this->_valid_answers_trimmed)
+    std::map<std::string, double> avg_bucket_size;
+    std::map<std::string, colored_buckets_t> all_buckets;
+    for (auto guess : guess_words)
     {
-        colored_buckets_t colored_buckets = this->calc_buckets(word, this->_valid_answers_trimmed);
-        answer_avg_bucket_size[word] = get_average_bucket_size(colored_buckets);
-        if (num_answers < 20)
-            std::cout << word << "\n" << print_buckets(colored_buckets);// << "\n";
-        answer_all_buckets[word] = colored_buckets;
+        colored_buckets_t colored_buckets = this->calc_buckets(guess, this->_valid_answers_trimmed);
+        avg_bucket_size[guess] = get_average_bucket_size(colored_buckets);
+        if (num_answers < 20 && num_answers == guess_words.size())
+            std::cout << guess << "\n" << this->print_buckets(colored_buckets);// << "\n";
+        if (avg_bucket_size[guess] < 21)
+            all_buckets[guess] = colored_buckets;
     }
-    std::set<std::pair<std::string, double>, comparator> answers_ordered(answer_avg_bucket_size.begin(), answer_avg_bucket_size.end());
+
+    std::set<std::pair<std::string, double>, comparator> ordered_guesses(avg_bucket_size.begin(), avg_bucket_size.end());
     int count = 0;
     int count_cutoff = num_answers > 30 ? 20 : num_answers;
-    for (auto [word, average_words_remaining] : answers_ordered)
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(4);
+    std::cout << "                avg    max\n";
+    std::cout << "       total  bucket bucket\n";
+    std::cout << "     buckets   depth  depth\n";
+    for (auto [guess, average_words_remaining] : ordered_guesses)
     {
-        std::cout << "    " << word << " :: average bucket: " << average_words_remaining << ", max bucket: " << max_bucket_size(answer_all_buckets[word])
-                << ",  " << bucket_depth_str(answer_all_buckets[word]) << "\n";
+        ss << "" << guess << ",  "
+            << std::setw(3) <<  all_buckets[guess].size()
+            << ",  " << average_words_remaining
+            << ",   " << max_bucket_size(all_buckets[guess])
+            << "   " << bucket_depth_str(all_buckets[guess]) << "\n";
         if (count++ >= count_cutoff)
             break;
     }
+    std::cout << ss.str();
+    return all_buckets;
+}
 
-     std::cout  << "\n\nguesses:\n";
-    std::map<std::string, double> guess_avg_bucket_size;
-    std::map<std::string, colored_buckets_t> guess_all_buckets;
-    for (auto word : this->_valid_guesses_orig)
-    {
-        colored_buckets_t colored_buckets = this->calc_buckets(word, this->_valid_answers_trimmed);
-        guess_avg_bucket_size[word] = get_average_bucket_size(colored_buckets);
-        guess_all_buckets[word] = colored_buckets;
-    }
-    std::set<std::pair<std::string, double>, comparator> guesses_ordered(guess_avg_bucket_size.begin(), guess_avg_bucket_size.end());
-    count = 0;
-    for (auto [word, average_words_remaining] : guesses_ordered)
-    {
-        std::cout << "    " << word << " :: " << average_words_remaining << ", max bucket: " << max_bucket_size(guess_all_buckets[word])
-                << ",  " << bucket_depth_str(guess_all_buckets[word]) << "\n";
-        if (count++ >= count_cutoff)
-            break;
-    }
+void WordSuggester::collect_buckets()
+{
+    std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
+    std::map<std::string, colored_buckets_t> answer_buckets = collect_buckets(this->_valid_answers_trimmed);
+
+    std::cout  << "\n\nguesses:\n";
+    std::map<std::string, colored_buckets_t> guess_buckets = collect_buckets(this->_valid_guesses_orig);
 
     // A place for a break point
     int c = 0;
