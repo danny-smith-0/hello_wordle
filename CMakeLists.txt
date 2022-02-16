@@ -14,3 +14,8 @@ target_compile_features( wordle_word_suggester
 	PRIVATE
 	cxx_std_17
 )
+
+target_compile_options( wordle_word_suggester
+    PRIVATE
+    /Ot
+)
