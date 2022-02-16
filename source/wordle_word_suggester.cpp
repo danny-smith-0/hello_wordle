@@ -26,13 +26,13 @@ void WordSuggester::load_words()
     std::string line;
     while (std::getline(file_stream1, line))
         _valid_answers_orig.push_back(line);
+    _valid_answers_trimmed = _valid_answers_orig;
 
     file_path = "../include/valid_guesses.txt";
     std::ifstream file_stream2 (file_path);
     while (std::getline(file_stream2, line))
         _valid_guesses_orig.push_back(line);
 
-    _valid_answers_trimmed = _valid_answers_orig;
 }
 
 size_t WordSuggester::remove_words_with_letter(char letter)
