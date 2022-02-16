@@ -363,17 +363,17 @@ double get_average_bucket_size(colored_buckets_t in)
     return total_elements / static_cast<double>(in.size());
 }
 
-size_t max_bucket_size(colored_buckets_t in)
+size_t max_bucket_depth(colored_buckets_t in)
 {
-    size_t max_bucket_size = 0;
+    size_t max_bucket_depth = 0;
     for (auto row : in)
-        max_bucket_size = std::max(row.second.size(), max_bucket_size);
-    return max_bucket_size;
+        max_bucket_depth = std::max(row.second.size(), max_bucket_depth);
+    return max_bucket_depth;
 }
 
 std::string bucket_depth_str(colored_buckets_t in)
 {
-    size_t max_buckets = 20;
+    size_t max_buckets = 30;
     std::stringstream out;
     if (in.size() <= max_buckets)
     {
@@ -434,7 +434,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t 
         ss << "" << guess << ",  "
             << std::setw(3) <<  all_buckets[guess].size()
             << ",  " << average_words_remaining
-            << ",   " << max_bucket_size(all_buckets[guess])
+            << ",  " << std::setw(3) << max_bucket_depth(all_buckets[guess])
             << "   " << bucket_depth_str(all_buckets[guess]) << "\n";
         if (count++ >= count_cutoff)
             break;
