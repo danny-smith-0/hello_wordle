@@ -10,6 +10,7 @@
 
 using namespace wordle;
 
+#define HARD_MODE 0
 
 template <typename T>
 void sort_and_remove_non_unique_elements(T* vector_or_string)
@@ -33,6 +34,9 @@ void WordSuggester::load_words()
     while (std::getline(file_stream2, line))
         _valid_guesses_orig.push_back(line);
 
+    #if HARD_MODE
+    _valid_guesses_trimmed = _valid_guesses_orig;
+    #endif  // HARD_MODE
 }
 
 size_t WordSuggester::remove_words_with_letter(char letter)
@@ -48,6 +52,16 @@ size_t WordSuggester::remove_words_with_letter(char letter)
             ++itr;
     }
 
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(letter) != std::string::npos)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
+
     return _valid_answers_trimmed.size();
 }
 
@@ -60,6 +74,16 @@ size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
         else
             ++itr;
     }
+
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
 
     return _valid_answers_trimmed.size();
 }
@@ -104,6 +128,18 @@ size_t WordSuggester::remove_words_without_letter(char required_letter, bool dup
             ++itr;
     }
 
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        size_t pos =      itr->find(required_letter);
+        pos = duplicate ? itr->find(required_letter, pos + 1) : pos;
+        if (pos == std::string::npos)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
+
     return _valid_answers_trimmed.size();
 }
 
@@ -119,6 +155,16 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
         else
             ++itr;
     }
+
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
 
     return _valid_answers_trimmed.size();
 }
@@ -446,10 +492,27 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t 
 void WordSuggester::collect_buckets()
 {
     std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
-    std::map<std::string, colored_buckets_t> answer_buckets = collect_buckets(this->_valid_answers_trimmed);
+    std::map<std::string, colored_buckets_t> answer_buckets_trim = collect_buckets(this->_valid_answers_trimmed);
 
-    std::cout  << "\n\nguesses:\n";
-    std::map<std::string, colored_buckets_t> guess_buckets = collect_buckets(this->_valid_guesses_orig);
+    // Quordle
+    // std::cout  << "\n\nuntrimmed answers:\n";
+    // words_t these_words;
+    // these_words.push_back("daily");
+    // these_words.push_back("dally");
+    // these_words.push_back("valid");
+    // these_words.push_back("villa");
+    // these_words.push_back("imply");
+    // these_words.push_back("lymph");
+    // std::map<std::string, colored_buckets_t> answer_buckets_untrimmed = collect_buckets(these_words);
+
+    #if HARD_MODE
+    // For hard mode
+    std::cout  << "\n\nguesses (trimmed):\n";
+    std::map<std::string, colored_buckets_t> guess_buckets_trim = collect_buckets(this->_valid_guesses_trimmed);
+    #endif  // HARD_MODE
+
+    std::cout  << "\n\nguesses (all):\n";
+    std::map<std::string, colored_buckets_t> guess_buckets_orig = collect_buckets(this->_valid_guesses_orig);
 
     // A place for a break point
     int c = 0;

@@ -48,6 +48,7 @@ namespace wordle
         words_t _valid_answers_orig;    // As loaded from file
         words_t _valid_answers_trimmed; // Allows removing
         words_t _valid_guesses_orig;    // As loaded from file
+        words_t _valid_guesses_trimmed; // Allows removing
 
         std::string _required_letters;
         std::string _excluded_letters;
