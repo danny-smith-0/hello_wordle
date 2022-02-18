@@ -454,14 +454,14 @@ struct comparator
 std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t guess_words)
 {
     int num_answers = static_cast<int>(this->_valid_answers_trimmed.size());
-
+    bool guess_words_are_answers = num_answers == guess_words.size();
     std::map<std::string, double> avg_bucket_size;
     std::map<std::string, colored_buckets_t> all_buckets;
     for (auto guess : guess_words)
     {
         colored_buckets_t colored_buckets = this->calc_buckets(guess, this->_valid_answers_trimmed);
         avg_bucket_size[guess] = get_average_bucket_size(colored_buckets);
-        if (num_answers < 20 && num_answers == guess_words.size())
+        if (num_answers < 20 && guess_words_are_answers)
             std::cout << guess << "\n" << this->print_buckets(colored_buckets);// << "\n";
         if (avg_bucket_size[guess] < 21)
             all_buckets[guess] = colored_buckets;
@@ -469,7 +469,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t 
 
     std::set<std::pair<std::string, double>, comparator> ordered_guesses(avg_bucket_size.begin(), avg_bucket_size.end());
     int count = 0;
-    int count_cutoff = num_answers > 30 ? 20 : num_answers;
+    int count_cutoff = (!guess_words_are_answers || num_answers > 30) ? 20 : num_answers;
     std::stringstream ss;
     ss << std::fixed << std::setprecision(4);
     std::cout << "                avg    max\n";
