@@ -494,16 +494,11 @@ void WordSuggester::collect_buckets()
     std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
     std::map<std::string, colored_buckets_t> answer_buckets_trim = collect_buckets(this->_valid_answers_trimmed);
 
-    // Quordle
+    // // Quordle
     // std::cout  << "\n\nuntrimmed answers:\n";
-    // words_t these_words;
-    // these_words.push_back("daily");
-    // these_words.push_back("dally");
-    // these_words.push_back("valid");
-    // these_words.push_back("villa");
-    // these_words.push_back("imply");
-    // these_words.push_back("lymph");
-    // std::map<std::string, colored_buckets_t> answer_buckets_untrimmed = collect_buckets(these_words);
+    // words_t remaining_words;
+    // // remaining_words.push_back("");
+    // std::map<std::string, colored_buckets_t> answer_buckets_untrimmed = collect_buckets(remaining_words);
 
     #if HARD_MODE
     // For hard mode
