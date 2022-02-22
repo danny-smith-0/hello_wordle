@@ -511,8 +511,10 @@ void WordSuggester::collect_buckets()
     std::map<std::string, colored_buckets_t> guess_buckets_trim = collect_buckets(this->_valid_guesses_trimmed);
     #endif  // HARD_MODE
 
-    std::cout  << "\n\nguesses (all):\n";
-    std::map<std::string, colored_buckets_t> guess_buckets_orig = collect_buckets(this->_valid_guesses_orig);
+    std::cout  << "\n\nall guesses & answers:\n";
+    auto all_words = this->_valid_guesses_orig;
+    all_words.insert(all_words.end(), this->_valid_answers_orig.begin(), this->_valid_answers_orig.end());
+    std::map<std::string, colored_buckets_t> guess_buckets_orig = collect_buckets(all_words);
 
     // A place for a break point
     int c = 0;
