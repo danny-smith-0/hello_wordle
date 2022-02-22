@@ -88,7 +88,7 @@ size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
     return _valid_answers_trimmed.size();
 }
 
-void WordSuggester::black_letter(char letter)
+void WordSuggester::B(char letter)
 {
     this->remove_words_with_letter(letter);
 }
@@ -102,12 +102,12 @@ void WordSuggester::black_duplicate_letter(char letter, size_t green_index)
     if (green_index != 4) this->remove_words_with_letter_index(letter, 4);
 }
 
-void WordSuggester::green_letter(char letter, size_t correct_index)
+void WordSuggester::G(char letter, size_t correct_index)
 {
     this->remove_words_without_letter_index(letter, correct_index);
 }
 
-void WordSuggester::yellow_letter(char letter, size_t wrong_index, bool is_duplicate)
+void WordSuggester::Y(char letter, size_t wrong_index, bool is_duplicate)
 {
     this->remove_words_without_letter(letter, is_duplicate);
     this->remove_words_with_letter_index(letter, wrong_index);
@@ -539,9 +539,10 @@ int main()
     std::cout << "Libraries loaded.\n";
 
     bool duplicate = true;
-    // word_suggester.black_letter( '');
-    // word_suggester.green_letter( '', );
-    // word_suggester.yellow_letter('', );
+    // word_suggester.B('');
+    // word_suggester.G('', );
+    // word_suggester.Y('', );
+
 
 
 

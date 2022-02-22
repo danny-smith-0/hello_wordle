@@ -20,10 +20,10 @@ namespace wordle
         void print_words(int words_per_row = 1, words_t words = words_t());
         std::string print_buckets(colored_buckets_t const& results);
 
-        void black_letter(char letter);
+        void B(char letter);
         void black_duplicate_letter(char letter, size_t green_index);
-        void green_letter(char letter, size_t correct_index);
-        void yellow_letter(char letter, size_t wrong_index, bool is_duplicate = false);
+        void G(char letter, size_t correct_index);
+        void Y(char letter, size_t wrong_index, bool is_duplicate = false);
 
         void suggest();
 
