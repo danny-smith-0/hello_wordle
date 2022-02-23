@@ -10,6 +10,7 @@
 
 using namespace wordle;
 
+#define HARD_MODE 0
 
 template <typename T>
 void sort_and_remove_non_unique_elements(T* vector_or_string)
@@ -33,6 +34,9 @@ void WordSuggester::load_words()
     while (std::getline(file_stream2, line))
         _valid_guesses_orig.push_back(line);
 
+    #if HARD_MODE
+    _valid_guesses_trimmed = _valid_guesses_orig;
+    #endif  // HARD_MODE
 }
 
 size_t WordSuggester::remove_words_with_letter(char letter)
@@ -48,6 +52,16 @@ size_t WordSuggester::remove_words_with_letter(char letter)
             ++itr;
     }
 
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(letter) != std::string::npos)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
+
     return _valid_answers_trimmed.size();
 }
 
@@ -61,10 +75,20 @@ size_t WordSuggester::remove_words_with_letter_index(char letter, size_t index)
             ++itr;
     }
 
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(letter) != std::string::npos && itr->at(index) == letter)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
+
     return _valid_answers_trimmed.size();
 }
 
-void WordSuggester::black_letter(char letter)
+void WordSuggester::B(char letter)
 {
     this->remove_words_with_letter(letter);
 }
@@ -78,12 +102,12 @@ void WordSuggester::black_duplicate_letter(char letter, size_t green_index)
     if (green_index != 4) this->remove_words_with_letter_index(letter, 4);
 }
 
-void WordSuggester::green_letter(char letter, size_t correct_index)
+void WordSuggester::G(char letter, size_t correct_index)
 {
     this->remove_words_without_letter_index(letter, correct_index);
 }
 
-void WordSuggester::yellow_letter(char letter, size_t wrong_index, bool is_duplicate)
+void WordSuggester::Y(char letter, size_t wrong_index, bool is_duplicate)
 {
     this->remove_words_without_letter(letter, is_duplicate);
     this->remove_words_with_letter_index(letter, wrong_index);
@@ -104,6 +128,18 @@ size_t WordSuggester::remove_words_without_letter(char required_letter, bool dup
             ++itr;
     }
 
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        size_t pos =      itr->find(required_letter);
+        pos = duplicate ? itr->find(required_letter, pos + 1) : pos;
+        if (pos == std::string::npos)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
+
     return _valid_answers_trimmed.size();
 }
 
@@ -119,6 +155,16 @@ size_t WordSuggester::remove_words_without_letter_index(char required_letter, si
         else
             ++itr;
     }
+
+    #if HARD_MODE
+    for (auto itr = _valid_guesses_trimmed.begin(); itr != _valid_guesses_trimmed.end(); )
+    {
+        if (itr->find(required_letter) == std::string::npos || itr->at(index) != required_letter)
+            itr = _valid_guesses_trimmed.erase(itr);
+        else
+            ++itr;
+    }
+    #endif  // HARD_MODE
 
     return _valid_answers_trimmed.size();
 }
@@ -408,14 +454,14 @@ struct comparator
 std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t guess_words)
 {
     int num_answers = static_cast<int>(this->_valid_answers_trimmed.size());
-
+    bool guess_words_are_answers = num_answers == guess_words.size();
     std::map<std::string, double> avg_bucket_size;
     std::map<std::string, colored_buckets_t> all_buckets;
     for (auto guess : guess_words)
     {
         colored_buckets_t colored_buckets = this->calc_buckets(guess, this->_valid_answers_trimmed);
         avg_bucket_size[guess] = get_average_bucket_size(colored_buckets);
-        if (num_answers < 20 && num_answers == guess_words.size())
+        if (num_answers < 20 && guess_words_are_answers)
             std::cout << guess << "\n" << this->print_buckets(colored_buckets);// << "\n";
         if (avg_bucket_size[guess] < 21)
             all_buckets[guess] = colored_buckets;
@@ -423,7 +469,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t 
 
     std::set<std::pair<std::string, double>, comparator> ordered_guesses(avg_bucket_size.begin(), avg_bucket_size.end());
     int count = 0;
-    int count_cutoff = num_answers > 30 ? 20 : num_answers;
+    int count_cutoff = (!guess_words_are_answers || num_answers > 30) ? 20 : num_answers;
     std::stringstream ss;
     ss << std::fixed << std::setprecision(4);
     std::cout << "                avg    max\n";
@@ -446,10 +492,24 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(words_t 
 void WordSuggester::collect_buckets()
 {
     std::cout  << "\n\nhow_many_words_remain_after_guess\nanswers: (out of " << this->_valid_answers_trimmed.size() << ")\n";
-    std::map<std::string, colored_buckets_t> answer_buckets = collect_buckets(this->_valid_answers_trimmed);
+    std::map<std::string, colored_buckets_t> answer_buckets_trim = collect_buckets(this->_valid_answers_trimmed);
 
-    std::cout  << "\n\nguesses:\n";
-    std::map<std::string, colored_buckets_t> guess_buckets = collect_buckets(this->_valid_guesses_orig);
+    // // Quordle
+    // std::cout  << "\n\nuntrimmed answers:\n";
+    // words_t remaining_words;
+    // // remaining_words.push_back("");
+    // std::map<std::string, colored_buckets_t> answer_buckets_untrimmed = collect_buckets(remaining_words);
+
+    #if HARD_MODE
+    // For hard mode
+    std::cout  << "\n\nguesses (trimmed):\n";
+    std::map<std::string, colored_buckets_t> guess_buckets_trim = collect_buckets(this->_valid_guesses_trimmed);
+    #endif  // HARD_MODE
+
+    std::cout  << "\n\nall guesses & answers:\n";
+    auto all_words = this->_valid_guesses_orig;
+    all_words.insert(all_words.end(), this->_valid_answers_orig.begin(), this->_valid_answers_orig.end());
+    std::map<std::string, colored_buckets_t> guess_buckets_orig = collect_buckets(all_words);
 
     // A place for a break point
     int c = 0;
@@ -476,9 +536,10 @@ int main()
     std::cout << "Libraries loaded.\n";
 
     bool duplicate = true;
-    // word_suggester.black_letter( '');
-    // word_suggester.green_letter( '', );
-    // word_suggester.yellow_letter('', );
+    // word_suggester.B('');
+    // word_suggester.G('', );
+    // word_suggester.Y('', );
+
 
 
 
