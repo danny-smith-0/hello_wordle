@@ -246,7 +246,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs c
         avg_bucket_size[guess] = get_average_bucket_size(colored_buckets);
         if (num_answers < 20 && guess_words_are_answers)
             std::cout << guess << "\n" << this->print_buckets(colored_buckets);// << "\n";
-        if (avg_bucket_size[guess] < 21)
+        // if (avg_bucket_size[guess] < 21) // For optimization, but breaks the new method
             all_buckets[guess] = colored_buckets;
     }
 
@@ -315,6 +315,15 @@ std::string WordSuggester::print_buckets(colored_buckets_t const& colored_bucket
     return ss.str();
 }
 
+words_t words_list_intersection(words_t const& w1, words_t const& w2)
+{
+    words_t intersection;
+    for (auto word : w1) {
+        if (std::find(w2.begin(), w2.end(), word) != w2.end())
+            intersection.push_back(word); }
+    return intersection;
+}
+
 int main()
 {
     std::cout << "Hello Wordle!\n";
@@ -330,6 +339,12 @@ int main()
     bool suggest_guesses = false;
     std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
+    std::cout << "\n--------\n";
+    words_t words =                        answers["slate"]["BBBBB"];
+    // words = words_list_intersection(words, answers["court"]["BBBBG"]);
+    // std::cout << "Remaining words: " << words.size() << "\n";
+    inputs._valid_answers_trimmed = words;
+    std::map<std::string, colored_buckets_t> answersTL = word_suggester.suggest(inputs);
     int c = 0;
     c++;
 }
