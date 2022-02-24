@@ -17,9 +17,9 @@ namespace wordle
         void print_words(int words_per_row = 1, words_t words = words_t());
         std::string print_buckets(colored_buckets_t const& results);
 
-        void suggest(Inputs const& inputs);
+        std::map<std::string, colored_buckets_t> suggest(Inputs const& inputs, bool suggest_guesses = true);
 
-        void collect_buckets(Inputs const& inputs);
+        std::map<std::string, colored_buckets_t> collect_buckets(Inputs const& inputs, bool suggest_guesses = true);
         std::map<std::string, colored_buckets_t> collect_buckets(Inputs const& inputs, words_t words);
         colored_buckets_t calc_buckets(std::string guess, words_t words);
 

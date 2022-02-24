@@ -57,18 +57,18 @@ void WordSuggester::subtract_required_letters(std::vector<std::string> const& wo
     }
 }
 
-void WordSuggester::suggest(Inputs const& inputs)
+std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& inputs, bool suggest_guesses)
 {
     if (inputs._valid_answers_trimmed.size() == 1)
     {
         std::cout << "\nFinal answer: " << inputs._valid_answers_trimmed[0] << "\n\n";
-        return;
+        return std::map<std::string, colored_buckets_t>();
     }
 
     if (inputs._valid_answers_trimmed.size() == 2)
     {
         std::cout << "\nFlip a coin!\n" << inputs._valid_answers_trimmed[0] << "\n" << inputs._valid_answers_trimmed[1] << "\n\n";
-        return;
+        return std::map<std::string, colored_buckets_t>();
     }
 
     // Get all the letters in the words that weren't required, grouped all together and by word
@@ -120,7 +120,8 @@ void WordSuggester::suggest(Inputs const& inputs)
     Compare all guess words, see which have the min, max, and average number of remaining words across the guess and all remaining valid answers
     */
 
-    this->collect_buckets(inputs);
+    std::map<std::string, colored_buckets_t> answers = this->collect_buckets(inputs, suggest_guesses);
+    return answers;
 }
 
 colored_buckets_t WordSuggester::calc_buckets(std::string guess, std::vector<std::string> words)
@@ -271,7 +272,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs c
     return all_buckets;
 }
 
-void WordSuggester::collect_buckets(Inputs const& inputs)
+std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs const& inputs, bool suggest_guesses)
 {
     std::cout  << "how_many_words_remain_after_guess\nanswers: (out of " << inputs._valid_answers_trimmed.size() << ")\n";
     std::map<std::string, colored_buckets_t> answer_buckets_trim = collect_buckets(inputs, inputs._valid_answers_trimmed);
@@ -282,20 +283,23 @@ void WordSuggester::collect_buckets(Inputs const& inputs)
     // // remaining_words.push_back("");
     // std::map<std::string, colored_buckets_t> answer_buckets_untrimmed = collect_buckets(inputs, remaining_words);
 
-    #if HARD_MODE
-    // For hard mode
-    std::cout  << "\n\nguesses (trimmed):\n";
-    std::map<std::string, colored_buckets_t> guess_buckets_trim = collect_buckets(inputs, inputs._valid_guesses_trimmed);
-    #endif  // HARD_MODE
+    if (suggest_guesses)
+    {
+        #if HARD_MODE
+        // For hard mode
+        std::cout  << "\n\nguesses (trimmed):\n";
+        std::map<std::string, colored_buckets_t> guess_buckets_trim = collect_buckets(inputs, inputs._valid_guesses_trimmed);
+        #endif  // HARD_MODE
 
-    std::cout  << "\nall guesses & answers:\n";
-    auto all_words = inputs._valid_guesses_orig;
-    all_words.insert(all_words.end(), inputs._valid_answers_orig.begin(), inputs._valid_answers_orig.end());
-    std::map<std::string, colored_buckets_t> guess_buckets_orig = collect_buckets(inputs, all_words);
-
+        std::cout  << "\nall guesses & answers:\n";
+        auto all_words = inputs._valid_guesses_orig;
+        all_words.insert(all_words.end(), inputs._valid_answers_orig.begin(), inputs._valid_answers_orig.end());
+        std::map<std::string, colored_buckets_t> guess_buckets_orig = collect_buckets(inputs, all_words);
+    }
     // A place for a break point
     int c = 0;
     c++;
+    return answer_buckets_trim;
 }
 
 std::string WordSuggester::print_buckets(colored_buckets_t const& colored_buckets)
@@ -322,11 +326,9 @@ int main()
     // inputs.G('', );
     // inputs.Y('', );
 
-
-
-
     WordSuggester word_suggester;
-    word_suggester.suggest(inputs);
+    bool suggest_guesses = false;
+    std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
     int c = 0;
     c++;
