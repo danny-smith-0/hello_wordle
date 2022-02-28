@@ -337,35 +337,27 @@ int main()
 
     WordSuggester word_suggester;
     bool suggest_guesses = false;
+    inputs._valid_answers_trimmed.push_back("when_using_guess_words_put_them_here");
     std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
     std::cout << "\n--------\n";
     words_t words;
-    #define TOPLEFT     0
+    #define TOPLEFT     1
     #define TOPRIGHT    0
     #define BOTTOMLEFT  0
-    #define BOTTOMRIGHT 1
+    #define BOTTOMRIGHT 0
     #if TOPLEFT
         words =                                answers["slate"]["YBYGG"];
-        words = words_list_intersection(words, answers["round"]["BBBBB"]);
-        words = words_list_intersection(words, answers["skimp"]["YBBBY"]);
+        // words = words_list_intersection(words, answers["round"]["BBBBB"]);
     #elif TOPRIGHT
         words =                                answers["slate"]["BBYYB"];
-        words = words_list_intersection(words, answers["round"]["BBYBB"]);
-        words = words_list_intersection(words, answers["skimp"]["BBBBY"]);
-        words = words_list_intersection(words, answers["skiff"]["BBBBB"]);
-        words = words_list_intersection(words, answers["paste"]["YGBYB"]);
+        // words = words_list_intersection(words, answers["round"]["BBYBB"]);
     #elif BOTTOMLEFT
         words =                                answers["slate"]["GBBBB"];
-        words = words_list_intersection(words, answers["round"]["BBBBB"]);
-        words = words_list_intersection(words, answers["skimp"]["GGGBB"]);
+        // words = words_list_intersection(words, answers["round"]["BBBBB"]);
     #elif BOTTOMRIGHT
         words =                                answers["slate"]["BBBBB"];
-        words = words_list_intersection(words, answers["round"]["YYBBB"]);
-        words = words_list_intersection(words, answers["skimp"]["BBYBB"]);
-        words = words_list_intersection(words, answers["skiff"]["BBYBB"]);
-        words = words_list_intersection(words, answers["paste"]["BBBBB"]);
-        words = words_list_intersection(words, answers["caput"]["GBBBB"]);
+        // words = words_list_intersection(words, answers["round"]["YYBBB"]);
     #endif
     inputs._valid_answers_trimmed = words;
     std::map<std::string, colored_buckets_t> answersB = word_suggester.suggest(inputs);
