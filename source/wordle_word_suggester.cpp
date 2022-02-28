@@ -340,11 +340,35 @@ int main()
     std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
     std::cout << "\n--------\n";
-    words_t words =                        answers["slate"]["BBBBB"];
-    // words = words_list_intersection(words, answers["court"]["BBBBG"]);
-    // std::cout << "Remaining words: " << words.size() << "\n";
+    words_t words;
+    #define TOPLEFT     0
+    #define TOPRIGHT    0
+    #define BOTTOMLEFT  0
+    #define BOTTOMRIGHT 1
+    #if TOPLEFT
+        words =                                answers["slate"]["YBYGG"];
+        words = words_list_intersection(words, answers["round"]["BBBBB"]);
+        words = words_list_intersection(words, answers["skimp"]["YBBBY"]);
+    #elif TOPRIGHT
+        words =                                answers["slate"]["BBYYB"];
+        words = words_list_intersection(words, answers["round"]["BBYBB"]);
+        words = words_list_intersection(words, answers["skimp"]["BBBBY"]);
+        words = words_list_intersection(words, answers["skiff"]["BBBBB"]);
+        words = words_list_intersection(words, answers["paste"]["YGBYB"]);
+    #elif BOTTOMLEFT
+        words =                                answers["slate"]["GBBBB"];
+        words = words_list_intersection(words, answers["round"]["BBBBB"]);
+        words = words_list_intersection(words, answers["skimp"]["GGGBB"]);
+    #elif BOTTOMRIGHT
+        words =                                answers["slate"]["BBBBB"];
+        words = words_list_intersection(words, answers["round"]["YYBBB"]);
+        words = words_list_intersection(words, answers["skimp"]["BBYBB"]);
+        words = words_list_intersection(words, answers["skiff"]["BBYBB"]);
+        words = words_list_intersection(words, answers["paste"]["BBBBB"]);
+        words = words_list_intersection(words, answers["caput"]["GBBBB"]);
+    #endif
     inputs._valid_answers_trimmed = words;
-    std::map<std::string, colored_buckets_t> answersTL = word_suggester.suggest(inputs);
+    std::map<std::string, colored_buckets_t> answersB = word_suggester.suggest(inputs);
     int c = 0;
     c++;
 }
