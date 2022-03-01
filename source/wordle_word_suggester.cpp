@@ -324,6 +324,50 @@ words_t words_list_intersection(words_t const& w1, words_t const& w2)
     return intersection;
 }
 
+words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answers)
+{
+    words_t words;
+    std::string guess_str, result_str, bool_str;
+    bool more_guesses = false;
+    bool first_guess  = true;
+    int count = 0;
+    do {
+        std::cout << "--Enter your guess and color result on two separate lines \n";
+        std::getline (std::cin, guess_str);
+        std::getline (std::cin, result_str);
+        std::cout << "Guess: " << guess_str << ", result: " << result_str << "\n";
+        if (first_guess)
+            words = answers[guess_str][result_str];
+        else
+            words = words_list_intersection(words, answers[guess_str][result_str]);
+        first_guess = false;
+        if (++count < 6)
+        {
+            std::cout << "--Another guess or proceed to suggestions? (0 = proceed. 1: more guesses)\n";
+            std::getline (std::cin, bool_str);
+            std::stringstream(bool_str) >> more_guesses;
+        }
+        else
+            more_guesses = false;
+    }
+    while (more_guesses);
+    std::cout << std::endl;
+    return words;
+}
+
+bool user_says_to_suggest_guesses()
+{
+    bool suggest_guesses = false;
+
+    // cin suggest_guesses
+    std::string bool_str;
+    std::cout << "--Enter preferred type of suggestions: (0 = valid answers only, 1 = valid answers and guesses)\n";
+    std::getline (std::cin, bool_str);
+    std::stringstream(bool_str) >> suggest_guesses;
+
+    return suggest_guesses;
+}
+
 int main()
 {
     std::cout << "Hello Wordle!\n";
@@ -342,12 +386,15 @@ int main()
 
     std::cout << "\n--------\n";
     words_t words;
-    #define TOPLEFT     1
+    #define TOPLEFT     0
     #define TOPRIGHT    0
     #define BOTTOMLEFT  0
     #define BOTTOMRIGHT 0
+
+    words = trim_words_by_user_inputs(answers);
+
     #if TOPLEFT
-        words =                                answers["slate"]["YBYGG"];
+        words =                                answers[guess_str][result_str];
         // words = words_list_intersection(words, answers["round"]["BBBBB"]);
     #elif TOPRIGHT
         words =                                answers["slate"]["BBYYB"];
@@ -360,7 +407,8 @@ int main()
         // words = words_list_intersection(words, answers["round"]["YYBBB"]);
     #endif
     inputs._valid_answers_trimmed = words;
-    std::map<std::string, colored_buckets_t> answersB = word_suggester.suggest(inputs);
+    suggest_guesses = user_says_to_suggest_guesses();
+    std::map<std::string, colored_buckets_t> answersB = word_suggester.suggest(inputs, suggest_guesses);
     int c = 0;
     c++;
 }
