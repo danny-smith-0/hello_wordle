@@ -337,7 +337,7 @@ int main()
 
     WordSuggester word_suggester;
     bool suggest_guesses = false;
-    inputs._valid_answers_trimmed.push_back("when_using_guess_words_put_them_here");
+    // inputs._valid_answers_trimmed.push_back("when_using_guess_words_put_them_here");
     std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
     std::cout << "\n--------\n";
