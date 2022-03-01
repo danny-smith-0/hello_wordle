@@ -2,7 +2,8 @@
 
 #include <string>    // string and getline
 #include <fstream>   // std::ifstream (and ofstream)
-
+#include <iostream>  // cout and cin
+#include <sstream>   // stringstream
 #include <wordle_defs.h>
 
 
@@ -12,17 +13,39 @@ using namespace wordle;
 
 void Inputs::load_words()
 {
-    std::string file_path = "../include/valid_answers.txt";
-    std::ifstream file_stream1 (file_path);
+    std::ifstream file_stream1 ("../include/valid_answers.txt");
     std::string line;
     while (std::getline(file_stream1, line))
         _valid_answers_orig.push_back(line);
-    _valid_answers_trimmed = _valid_answers_orig;
 
-    file_path = "../include/valid_guesses.txt";
-    std::ifstream file_stream2 (file_path);
+    std::ifstream file_stream2 ("../include/valid_guesses.txt");
     while (std::getline(file_stream2, line))
         _valid_guesses_orig.push_back(line);
+
+
+    // Move previous from valid answers to valid guesses
+    bool move_previous_answers = false;
+    std::string bool_str;
+    std::cout << "--Move previous answers from valid answers to valid guesses? (0 = no, 1 = yes)\n";
+    std::getline (std::cin, bool_str);
+    std::stringstream(bool_str) >> move_previous_answers;
+
+    if (move_previous_answers)
+    {
+        std::ifstream file_stream3 ("../include/previous_answers.txt");
+        std::string prev_answer;
+        while (std::getline(file_stream3, prev_answer))
+        {
+            auto prev_answer_itr = std::find(_valid_answers_orig.begin(), _valid_answers_orig.end(), prev_answer);
+            if (prev_answer_itr != _valid_answers_orig.end())
+            {
+                _valid_answers_orig.erase(prev_answer_itr);
+                _valid_guesses_orig.push_back(prev_answer);
+            }
+        }
+    }
+
+    _valid_answers_trimmed = _valid_answers_orig;
 
     #if HARD_MODE
     _valid_guesses_trimmed = _valid_guesses_orig;
