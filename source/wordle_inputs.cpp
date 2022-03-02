@@ -8,22 +8,34 @@
 
 
 #define HARD_MODE 0
+#define SPANISH 0
 
 using namespace wordle;
 
+
 void Inputs::load_words()
 {
-    std::ifstream file_stream1 ("../include/valid_answers.txt");
+    #if SPANISH
+        std::ifstream file_stream1 ("../include/wordle_es.txt");
+    #else
+        std::ifstream file_stream1 ("../include/valid_answers.txt");
+    #endif
     std::string line;
     while (std::getline(file_stream1, line))
         _valid_answers_orig.push_back(line);
 
-    std::ifstream file_stream2 ("../include/valid_guesses.txt");
-    while (std::getline(file_stream2, line))
-        _valid_guesses_orig.push_back(line);
+    #if SPANISH
+    _valid_guesses_orig = _valid_answers_orig;
+    #else
+        std::ifstream file_stream2 ("../include/valid_guesses.txt");
+        while (std::getline(file_stream2, line))
+            _valid_guesses_orig.push_back(line);
+    #endif
+
 
 
     // Move previous from valid answers to valid guesses
+    #if !SPANISH
     bool move_previous_answers = false;
     std::string bool_str;
     std::cout << "--Move previous answers from valid answers to valid guesses? (0 = no, 1 = yes)\n";
@@ -44,6 +56,7 @@ void Inputs::load_words()
             }
         }
     }
+    #endif
 
     _valid_answers_trimmed = _valid_answers_orig;
 
