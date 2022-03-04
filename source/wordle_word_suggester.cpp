@@ -335,11 +335,11 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         std::cout << "--Enter your guess and color result on two separate lines \n";
         std::getline (std::cin, guess_str);
         std::getline (std::cin, result_str);
-        std::cout << "Guess: " << guess_str << ", result: " << result_str << "\n";
         if (first_guess)
             words = answers[guess_str][result_str];
         else
             words = words_list_intersection(words, answers[guess_str][result_str]);
+        std::cout << "Guess: " << guess_str << ", result: " << result_str << ". Words remaining: " << words.size() << "\n";
         first_guess = false;
         if (++count < 6)
         {
