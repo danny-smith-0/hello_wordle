@@ -341,7 +341,7 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
             words = words_list_intersection(words, answers[guess_str][result_str]);
         std::cout << "Guess: " << guess_str << ", result: " << result_str << ". Words remaining: " << words.size() << "\n";
         first_guess = false;
-        if (++count < 6)
+        if (words.size() > 1 && ++count < 6)
         {
             std::cout << "--Another guess or proceed to suggestions? (0 = proceed. 1: more guesses)\n";
             std::getline (std::cin, bool_str);
@@ -407,7 +407,9 @@ int main()
         // words = words_list_intersection(words, answers["round"]["YYBBB"]);
     #endif
     inputs._valid_answers_trimmed = words;
-    suggest_guesses = user_says_to_suggest_guesses();
+    // Allow user to request guesses if there are more than 2 remaining possibilities
+    if (words.size() > 2)
+        suggest_guesses = user_says_to_suggest_guesses();
     std::map<std::string, colored_buckets_t> answersB = word_suggester.suggest(inputs, suggest_guesses);
     int c = 0;
     c++;
