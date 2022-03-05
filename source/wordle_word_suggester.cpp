@@ -246,7 +246,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs c
         avg_bucket_size[guess] = get_average_bucket_size(colored_buckets);
         if (num_answers < 20 && guess_words_are_answers)
             std::cout << guess << "\n" << this->print_buckets(colored_buckets);// << "\n";
-        // if (avg_bucket_size[guess] < 21) // For optimization, but breaks the new method
+        // if (avg_bucket_size[guess] < 21) // For optimization, but breaks the new method  // For Spanish, use 85 for now.
             all_buckets[guess] = colored_buckets;
     }
 
@@ -368,10 +368,26 @@ bool user_says_to_suggest_guesses()
     return suggest_guesses;
 }
 
+GameType what_game()
+{
+    std::string input_str;
+    std::cout << "What game would you like to play? ("
+        << static_cast<int>(GameType::wordle)    << " = wordle, "
+        << static_cast<int>(GameType::quordle)   << " = quordle, "
+        << static_cast<int>(GameType::wordle_es) << " = wordle en español)\n";
+    std::getline (std::cin, input_str);
+    int game_type_int = 0;
+    std::stringstream(input_str) >> game_type_int;
+    GameType game_type = static_cast<GameType>(game_type_int);
+
+    return game_type;
+}
+
 int main()
 {
-    std::cout << "Hello Wordle!\n";
-    Inputs inputs;
+    std::cout << "Hello Wordle!\n\n";
+    GameType game_type = what_game();
+    Inputs inputs(game_type);
     std::cout << "Libraries loaded.\n";
 
     bool duplicate = true;
