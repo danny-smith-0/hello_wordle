@@ -15,7 +15,7 @@ namespace wordle
     class Inputs
     {
         public:
-        Inputs::Inputs(GameType game_type = GameType::wordle) { this->load_words(game_type); }
+        Inputs::Inputs(GameType game_type = GameType::wordle) : _game_type(game_type) { this->load_words(game_type); }
         void load_words(GameType game_type = GameType::wordle);
 
         void B(char letter);
@@ -37,6 +37,8 @@ namespace wordle
 
         std::string _required_letters;
         std::string _excluded_letters;
+
+        GameType _game_type {GameType::wordle};
     };
 }
 

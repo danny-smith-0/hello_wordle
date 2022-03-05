@@ -246,6 +246,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs c
         avg_bucket_size[guess] = get_average_bucket_size(colored_buckets);
         if (num_answers < 20 && guess_words_are_answers)
             std::cout << guess << "\n" << this->print_buckets(colored_buckets);// << "\n";
+        if (inputs._game_type != GameType::wordle_es || (inputs._game_type == GameType::wordle_es && avg_bucket_size[guess] < 85))
         // if (avg_bucket_size[guess] < 21) // For optimization, but breaks the new method  // For Spanish, use 85 for now.
             all_buckets[guess] = colored_buckets;
     }
