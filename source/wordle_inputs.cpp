@@ -13,41 +13,49 @@
 using namespace wordle;
 
 
-void Inputs::load_words()
+void Inputs::load_words(GameType game_type)
 {
-    #if SPANISH
-        std::ifstream file_stream1 ("../include/wordle_es.txt");
-    #else
-        std::ifstream file_stream1 ("../include/valid_answers.txt");
-    #endif
-    std::string line;
-    while (std::getline(file_stream1, line))
-        _valid_answers_orig.push_back(line);
+    // Get valid answers
+    std::ifstream file_stream;
+    if (game_type == GameType::wordle_es)
+        file_stream.open("../include/wordle_es.txt");
+    else
+        file_stream.open("../include/valid_answers.txt");
 
-    #if SPANISH
-    _valid_guesses_orig = _valid_answers_orig;
-    #else
-        std::ifstream file_stream2 ("../include/valid_guesses.txt");
-        while (std::getline(file_stream2, line))
+    std::string line;
+    while (std::getline(file_stream, line))
+        _valid_answers_orig.push_back(line);
+    file_stream.close();
+
+    // Get valid guesses
+    if (game_type == GameType::wordle_es)
+        _valid_guesses_orig = _valid_answers_orig;
+    else
+    {
+        file_stream.open("../include/valid_guesses.txt");
+        while (std::getline(file_stream, line))
             _valid_guesses_orig.push_back(line);
-    #endif
+        file_stream.close();
+    }
 
 
 
     // Move previous from valid answers to valid guesses
-    #if !SPANISH
-    bool move_previous_answers = false;
-    std::string bool_str;
-    std::cout << "--Move previous answers from valid answers to valid guesses? (0 = no, 1 = yes)\n";
-    std::getline (std::cin, bool_str);
-    std::stringstream(bool_str) >> move_previous_answers;
 
-    if (move_previous_answers)
+    // bool move_previous_answers = false;
+    // std::string bool_str;
+    // std::cout << "--Move previous answers from valid answers to valid guesses? (0 = no, 1 = yes)\n";
+    // std::getline (std::cin, bool_str);
+    // std::stringstream(bool_str) >> move_previous_answers;
+
+    // if (move_previous_answers)
+    if (game_type == GameType::wordle)
     {
-        std::ifstream file_stream3 ("../include/previous_answers.txt");
+        file_stream.open("../include/previous_answers.txt");
         std::string prev_answer;
-        while (std::getline(file_stream3, prev_answer))
+        while (std::getline(file_stream, prev_answer))
         {
+            // If the previous answer actually is in the answer set (it should be), remove from the answer set and add it to guess set
             auto prev_answer_itr = std::find(_valid_answers_orig.begin(), _valid_answers_orig.end(), prev_answer);
             if (prev_answer_itr != _valid_answers_orig.end())
             {
@@ -55,8 +63,8 @@ void Inputs::load_words()
                 _valid_guesses_orig.push_back(prev_answer);
             }
         }
+        file_stream.close();
     }
-    #endif
 
     _valid_answers_trimmed = _valid_answers_orig;
 

@@ -368,10 +368,26 @@ bool user_says_to_suggest_guesses()
     return suggest_guesses;
 }
 
+GameType what_game()
+{
+    std::string input_str;
+    std::cout << "What game would you like to play? ("
+        << static_cast<int>(GameType::wordle)    << " = wordle, "
+        << static_cast<int>(GameType::quordle)   << " = quordle, "
+        << static_cast<int>(GameType::wordle_es) << " = wordle en español)\n";
+    std::getline (std::cin, input_str);
+    int game_type_int = 0;
+    std::stringstream(input_str) >> game_type_int;
+    GameType game_type = static_cast<GameType>(game_type_int);
+
+    return game_type;
+}
+
 int main()
 {
-    std::cout << "Hello Wordle!\n";
-    Inputs inputs;
+    std::cout << "Hello Wordle!\n\n";
+    GameType game_type = what_game();
+    Inputs inputs(game_type);
     std::cout << "Libraries loaded.\n";
 
     bool duplicate = true;

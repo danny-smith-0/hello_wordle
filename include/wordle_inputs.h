@@ -5,11 +5,18 @@
 
 namespace wordle
 {
+    enum class GameType : int
+    {
+        wordle,     // english
+        quordle,    // english
+        wordle_es,  // spanish
+    };
+
     class Inputs
     {
         public:
-        Inputs::Inputs() { this->load_words(); }
-        void load_words();
+        Inputs::Inputs(GameType game_type = GameType::wordle) { this->load_words(game_type); }
+        void load_words(GameType game_type = GameType::wordle);
 
         void B(char letter);
         void black_duplicate_letter(char letter, size_t green_index);
