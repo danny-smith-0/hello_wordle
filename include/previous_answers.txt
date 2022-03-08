@@ -55,3 +55,7 @@ rupee
 nasty
 mourn
 ahead
+brine
+cloth
+hoard
+sweet
