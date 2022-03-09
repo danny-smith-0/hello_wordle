@@ -339,7 +339,17 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         if (first_guess)
             words = answers[guess_str][result_str];
         else
-            words = words_list_intersection(words, answers[guess_str][result_str]);
+        {
+            bucket_t bucket = answers[guess_str][result_str];
+            if (bucket.empty())
+            {
+                //
+
+                // inputs._valid_answers_trimmed.push_back("when_using_guess_words_put_them_here");
+                // std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
+            }
+            words = words_list_intersection(words, bucket);
+        }
         std::cout << "Guess: " << guess_str << ", result: " << result_str << ". Words remaining: " << words.size() << "\n";
         first_guess = false;
         if (words.size() > 1 && ++count < 6)
