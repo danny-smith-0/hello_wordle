@@ -25,7 +25,8 @@ namespace wordle
 
     // private:
         // functions
-        void subtract_required_letters(words_t const& words, std::string required_letters, std::string* unspecified_letters);
+        static std::string find_required_letters(words_t words);
+        static words_t subtract_required_letters(words_t const& words, std::string required_letters, std::string* unspecified_letters = 0);
     };
 }
 
