@@ -467,32 +467,12 @@ int main()
     std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
     std::cout << "\n--------\n";
-    words_t words;
-    #define TOPLEFT     0
-    #define TOPRIGHT    0
-    #define BOTTOMLEFT  0
-    #define BOTTOMRIGHT 0
-
-    words = trim_words_by_user_inputs(answers);
-
-    #if TOPLEFT
-        words =                                answers[guess_str][result_str];
-        // words = words_list_intersection(words, answers["round"]["BBBBB"]);
-    #elif TOPRIGHT
-        words =                                answers["slate"]["BBYYB"];
-        // words = words_list_intersection(words, answers["round"]["BBYBB"]);
-    #elif BOTTOMLEFT
-        words =                                answers["slate"]["GBBBB"];
-        // words = words_list_intersection(words, answers["round"]["BBBBB"]);
-    #elif BOTTOMRIGHT
-        words =                                answers["slate"]["BBBBB"];
-        // words = words_list_intersection(words, answers["round"]["YYBBB"]);
-    #endif
+    words_t words = trim_words_by_user_inputs(answers);
     inputs._valid_answers_trimmed = words;
     // Allow user to request guesses if there are more than 2 remaining possibilities
     if (words.size() > 2)
         suggest_guesses = user_says_to_suggest_guesses();
-    std::map<std::string, colored_buckets_t> answersB = word_suggester.suggest(inputs, suggest_guesses);
-    int c = 0;
-    c++;
+    std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
+    
+    return 0;
 }
