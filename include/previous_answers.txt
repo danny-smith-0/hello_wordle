@@ -63,3 +63,5 @@ month
 lapse
 watch
 today
+focus
+smelt
