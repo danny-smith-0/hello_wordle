@@ -467,16 +467,21 @@ int main()
     std::map<std::string, colored_buckets_t> answers = word_suggester.suggest(inputs, suggest_guesses);
 
     std::cout << "\n--------\n";
+
     bool success = false;
     while (!success)
     {
         words_t words = trim_words_by_user_inputs(answers);
         inputs._valid_answers_trimmed = words;
+        
         // Allow user to request guesses if there are more than 2 remaining possibilities
         if (words.size() > 2)
             suggest_guesses = user_says_to_suggest_guesses();
+
         word_suggester.suggest(inputs, suggest_guesses);
+
         success = words.size() < 2;
     }
+
     return 0;
 }
