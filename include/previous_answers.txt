@@ -65,3 +65,9 @@ watch
 today
 focus
 smelt
+tease
+cater
+movie
+saute
+allow
+renew
