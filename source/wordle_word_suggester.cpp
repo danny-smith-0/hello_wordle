@@ -473,7 +473,7 @@ int main()
     {
         words_t words = trim_words_by_user_inputs(answers);
         inputs._valid_answers_trimmed = words;
-        
+
         // Allow user to request guesses if there are more than 2 remaining possibilities
         if (words.size() > 2)
             suggest_guesses = user_says_to_suggest_guesses();
