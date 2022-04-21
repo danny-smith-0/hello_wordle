@@ -8,6 +8,8 @@
 
 #include <set>
 
+#include <print_buckets.h>
+
 using namespace wordle;
 
 #define HARD_MODE 0
@@ -88,6 +90,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
     */
 
     std::map<std::string, colored_buckets_t> answers = this->collect_buckets(inputs, suggest_guesses);
+    print::print_colored_buckets_to_json(answers, "slate");
     return answers;
 }
 
