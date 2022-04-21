@@ -73,47 +73,9 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
     if (inputs._valid_answers_trimmed.size() == 2)
     {
         std::cout << "\nFlip a coin!\n" << inputs._valid_answers_trimmed[0] << "\n" << inputs._valid_answers_trimmed[1] << "\n\n";
+        // TODO is there a random function I could implement here to simulate a coin flip?
         return std::map<std::string, colored_buckets_t>();
     }
-
-    // Get all the letters in the words that weren't required, grouped all together and by word
-    std::string unspecified_letters = "";
-
-    subtract_required_letters(inputs._valid_answers_trimmed, inputs._required_letters, &unspecified_letters);
-
-    // Count (score) the unspecified letters
-    std::sort(unspecified_letters.begin(), unspecified_letters.end());
-    std::map<char, size_t> letter_count;
-    if (!unspecified_letters.empty())
-    {
-        letter_count[unspecified_letters[0]] = 1;
-        for (auto itr = unspecified_letters.begin(); itr != unspecified_letters.end() - 1; ++itr)
-        {
-            if (*(itr + 1) == *itr)
-                ++letter_count[*itr];
-            else
-                letter_count[*(itr + 1)] = 1;
-        }
-    }
-
-    // Backwards letter count, then print in order
-    std::map<size_t, std::string> backwards_letter_count;
-    for (auto [letter, score] : letter_count)
-        backwards_letter_count[score] += letter;
-
-    std::stringstream ss;
-    std::cout << "Scoring the remaining words by the count of their unique unspecified letters\n ";
-    for (auto ritr = backwards_letter_count.rbegin(); ritr != backwards_letter_count.rend(); ++ritr)
-    {
-        std::string letters = ritr->second;
-        while (!letters.empty())
-        {
-            std::cout << "  " << letters[0] << " ";
-            letters.erase(0, 1);
-            ss << std::fixed << std::setw(4) << ritr->first;
-        }
-    }
-    std::cout << "\n" << ss.str() << "\n\n";
 
 
     /*
