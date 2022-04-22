@@ -1,8 +1,10 @@
-#include <wordle_defs.h>
+#include <print_buckets.h>
 
 #include <string>
 #include <sstream> // std::stringstream
 #include <fstream> // std::ofstream
+
+#include <wordle_defs.h>
 
 namespace wordle::print
 {
@@ -25,16 +27,18 @@ namespace wordle::print
             ss  << (first_color_string ? "\n" : ",\n" );
             first_color_string = false;
             ss  << "    \"" << color_string << "\":\n"
-                << "    [";
+                << "    {\n        \"size\": " << buckets.size() << ",\n        \"words\":\n"
+                << "        [";
 
             bool first_word = true;
             for (std::string word : buckets)
             {
                 ss  << (first_word ? "\n" : ",\n" );
                 first_word = false;
-                ss << "        \"" << word << "\"";
+                ss << "            \"" << word << "\"";
             }
-            ss << "\n    ]";
+            ss << "\n        ]";
+            ss << "\n    }";
         }
         ss << "\n}\n";
 
