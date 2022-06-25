@@ -167,3 +167,4 @@ gloat
 awful
 brink
 smite
+beady
