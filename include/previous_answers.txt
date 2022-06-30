@@ -169,3 +169,6 @@ brink
 smite
 beady
 rusty
+retro
+droll
+gawky
