@@ -172,3 +172,5 @@ rusty
 retro
 droll
 gawky
+hutch
+pinto
