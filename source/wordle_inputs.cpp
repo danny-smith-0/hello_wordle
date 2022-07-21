@@ -52,8 +52,18 @@ void Inputs::load_words(GameType game_type)
     if (game_type == GameType::wordle)
     {
         file_stream.open("../include/previous_answers.txt");
+        std::vector<std::string> prev_answers;
         std::string prev_answer;
         while (std::getline(file_stream, prev_answer))
+            prev_answers.push_back(prev_answer);
+
+        // Also remove the words before I started playing wordle
+        file_stream.close();
+        file_stream.open("../include/before_i_played_wordle.txt");
+        while (std::getline(file_stream, prev_answer))
+            prev_answers.push_back(prev_answer);
+
+        for (auto prev_answer : prev_answers)
         {
             // If the previous answer actually is in the answer set (it should be), remove from the answer set and add it to guess set
             auto prev_answer_itr = std::find(_valid_answers_orig.begin(), _valid_answers_orig.end(), prev_answer);
