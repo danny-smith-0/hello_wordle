@@ -191,3 +191,6 @@ wedge
 roomy
 wacky
 flock
+angry
+trite
+aphid
