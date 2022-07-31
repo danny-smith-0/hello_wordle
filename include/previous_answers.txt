@@ -202,3 +202,5 @@ cinch
 motto
 stomp
 upset
+bluff
+cramp
