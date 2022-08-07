@@ -207,3 +207,6 @@ cramp
 quart
 coyly
 youth
+rhyme
+buggy
+alien
