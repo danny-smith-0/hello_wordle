@@ -234,8 +234,8 @@ struct comparator
     bool operator()(T const& l, T const& r) const
     {
         if (l.second != r.second)
-            return l.second < r.second;
-        return l.first < r.first;
+            return l.second > r.second;
+        return l.first > r.first;
     }
 };
 

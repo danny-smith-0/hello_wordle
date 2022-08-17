@@ -34,9 +34,10 @@ void Inputs::load_words(GameType game_type)
     {
         file_stream.open("../include/valid_guesses.txt");
         while (std::getline(file_stream, line))
-            _valid_guesses_orig.push_back(line);
+            _valid_answers_orig.push_back(line);
         file_stream.close();
     }
+    _valid_guesses_orig = _valid_answers_orig;
 
 
 
