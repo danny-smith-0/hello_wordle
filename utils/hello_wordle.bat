@@ -1,3 +1,3 @@
 @echo off
-call wordle_word_suggester.exe
+call hello_wordle.exe
 cmd /k
