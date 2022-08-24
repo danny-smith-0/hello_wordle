@@ -15,3 +15,12 @@ target_compile_features( hello_wordle
 	PRIVATE
 	cxx_std_17
 )
+
+add_custom_command(
+    TARGET hello_wordle
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_LIST_DIR}/utils/play_hello_wordle_4.bat
+        ${CMAKE_CURRENT_LIST_DIR}/utils/play_hello_wordle.bat
+        ${CMAKE_BINARY_DIR}
+)
