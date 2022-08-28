@@ -228,3 +228,6 @@ waste
 merit
 woven
 needy
+clown
+irony
+ruder
