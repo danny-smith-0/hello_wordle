@@ -108,9 +108,9 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
         std::string letters = ritr->second;
         while (!letters.empty())
         {
-            std::cout << "  " << letters[0] << " ";
+            std::cout << "    " << letters[0] << " ";
             letters.erase(0, 1);
-            ss << std::fixed << std::setw(4) << ritr->first;
+            ss << std::fixed << std::setw(6) << ritr->first;
         }
     }
     std::cout << "\n" << ss.str() << "\n\n";
@@ -440,7 +440,8 @@ GameType what_game()
     std::cout << "What game would you like to play? ("
         << static_cast<int>(GameType::wordle)    << " = wordle, "
         << static_cast<int>(GameType::quordle)   << " = quordle, "
-        << static_cast<int>(GameType::wordle_es) << " = wordle en español)\n";
+        << static_cast<int>(GameType::wordle_es) << " = wordle en español), "
+        << static_cast<int>(GameType::nerdle)    << " = nerdle\n";
     std::getline (std::cin, input_str);
     int game_type_int = 0;
     std::stringstream(input_str) >> game_type_int;

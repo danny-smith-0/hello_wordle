@@ -19,6 +19,8 @@ void Inputs::load_words(GameType game_type)
     std::ifstream file_stream;
     if (game_type == GameType::wordle_es)
         file_stream.open("../include/wordle_es.txt");
+    else if (game_type == GameType::nerdle)
+        file_stream.open("../nerdle/solutions.txt");
     else
         file_stream.open("../include/valid_answers.txt");
 
@@ -28,7 +30,7 @@ void Inputs::load_words(GameType game_type)
     file_stream.close();
 
     // Get valid guesses
-    if (game_type == GameType::wordle_es)
+    if (game_type == GameType::wordle_es || game_type == GameType::nerdle)
         _valid_guesses_orig = _valid_answers_orig;
     else
     {
