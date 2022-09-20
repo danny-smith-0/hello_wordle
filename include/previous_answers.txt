@@ -242,3 +242,15 @@ inter
 whoop
 taunt
 leery
+class
+theme
+lofty
+tibia
+booze
+alpha
+thyme
+doubt
+parer
+chute
+stick
+trice
