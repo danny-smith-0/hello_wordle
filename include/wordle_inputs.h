@@ -10,6 +10,7 @@ namespace wordle
         wordle,     // english
         quordle,    // english
         wordle_es,  // spanish
+        nerdle,     // math
     };
 
     class Inputs
