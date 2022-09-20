@@ -17,22 +17,23 @@ one_big_solution_string = ""
 
 
 ## The answer template method
+single_digits_all         = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+single_digits_except_zero =    [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 three_digit_numbers = []
-for d100 in [1, 2, 3, 4, 5, 6, 7, 8, 9] : # no starting with a 0
-    for d10 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] :
-        for d1 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] :
+for d100 in single_digits_except_zero : # no starting with a 0
+    for d10 in single_digits_all :
+        for d1 in single_digits_all :
             three_digit_numbers.append(d100 * 100 + d10 * 10 + d1)
 print("three_digit_numbers len: " + str(len(three_digit_numbers)))
 
 two_digit_numbers = []
-for d10 in [1, 2, 3, 4, 5, 6, 7, 8, 9] : # no starting with a 0
-    for d1 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] :
+for d10 in single_digits_except_zero : # no starting with a 0
+    for d1 in single_digits_all :
         two_digit_numbers.append(d10 * 10 + d1)
 print("two_digit_numbers len: " + str(len(two_digit_numbers)))
 
-single_digits_all         = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-single_digits_except_zero =    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
 print("single_digits_all len: "         + str(len(single_digits_all)))
 print("single_digits_except_zero len: " + str(len(single_digits_except_zero)))
 
@@ -123,7 +124,7 @@ print("solutions_6c  ##o#o# = #  length " + str(len(solutions_6c)))
 #                     one_big_solution_string += solution_str
 #                     operator_count[oi1] = operator_count[oi1] + 1
 # print("solutions_6d  ##o###=#  length " + str(len(solutions_6d))) # LENGTH ZERO
-# print("solutions_6d  ##o### = #  length 0")
+print("solutions_6d  ##o### = #  length 0")
 
 # Build Template 6E: "###o##"
 solutions_6e = []
@@ -238,9 +239,6 @@ for oi1 in [0, 1, 2, 3] :
                     operator_count[oi1] = operator_count[oi1] + 1
 print("solutions_4b  ##o# = ###  length " + str(len(solutions_4b)))
 
-# for ii in range(len(operators)) :
-#     print(operators[ii] + " " + str(operator_count[ii]))
-
 all_counts = dict(Counter(one_big_solution_string))
 ordered_counts = OrderedDict(sorted(all_counts.items(), key=operator.itemgetter(1), reverse=True))
 for x,y in ordered_counts.items() :
@@ -258,44 +256,3 @@ for key, value in ordered_counts.items() :
 f2.close()
 
 print("\ndone")
-
-# # Make the string equations
-
-# six_char_expr = []
-# for c1 in [1, 2, 3, 4, 5, 6, 7, 8, 9] : # no 0s or operators in the 1st spot
-#     for c2 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "+", "-", "*", "/"]:
-#         for c3 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "+", "-", "*", "/"]:
-#             for c4 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "+", "-", "*", "/"]:
-#                 for c5 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "+", "-", "*", "/"]:
-#                     for c6 in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
-#                         new_expr = str(c1) + str(c2) + str(c3) + str(c4) + str(c5) + str(c6)
-#                         # Only add the new expression to the list if it evaluates
-#                         try:
-#                             eval(new_expr)
-#                             six_char_expr.append(new_expr)
-#                         except:
-#                             continue
-
-# for x in six_char_expr :
-#     print(x)
-
-
-
-
-# TEST STUFF - leave for reference
-
-# string_equations = [
-#     "1++1*",
-#     "1+1",
-#     "1+4=5"
-# ]
-# string_equations.append("90*2")
-
-
-# for string_equation in string_equations:
-
-#     try:
-#         answer = eval(string_equation)
-#         print(string_equation + "  =  " + str(answer))
-#     except:
-#         print(string_equation + " whoopsie!")
