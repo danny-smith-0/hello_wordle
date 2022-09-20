@@ -1,0 +1,18 @@
+Green
+Green 5 in third spot                                           \S{2}[^5]\S{5}\r\n
+
+Yellow
+Yellow Part 1 - remove any that have 7 in the yellow spot (6)   \S{5}7\S{2}\r\n
+Yellow Part 2 - remove any that don't have 3 ever:              [^3]{8}\r\n
+
+For all of the format `\S{n}1\S{m}\r\n`, n + m = 7. n or m may go down to zero
+
+Black
+Black 3,4,5,-, and *                                            \S{0,7}(3|4|5|-|\*)\S{0,7}\r\n
+    Any non whitespace between 0 and 7 times on either side of the blacked out chars
+    but make sure the last line has a line break
+
+In VS code, use just `\n`. In notepad++, use `\r\n`
+
+Others:
+(\d|\+|-|\*|\/|=)
