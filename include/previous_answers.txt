@@ -273,3 +273,9 @@ marsh
 sloth
 dandy
 vigor
+howdy
+enjoy
+valid
+ionic
+equal
+floor
