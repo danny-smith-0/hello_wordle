@@ -279,3 +279,7 @@ valid
 ionic
 equal
 floor
+catch
+spade
+stein
+exist
