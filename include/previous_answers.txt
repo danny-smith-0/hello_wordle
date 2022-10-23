@@ -283,3 +283,8 @@ catch
 spade
 stein
 exist
+quirk
+denim
+grove
+spiel
+gummy
