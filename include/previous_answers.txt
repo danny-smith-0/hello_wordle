@@ -287,4 +287,8 @@ quirk
 denim
 grove
 spiel
-gummy
+mummy
+fault
+foggy
+flout
+carry
