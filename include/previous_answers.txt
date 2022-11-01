@@ -294,3 +294,6 @@ flout
 carry
 sneak
 libel
+waltz
+aptly
+piney
