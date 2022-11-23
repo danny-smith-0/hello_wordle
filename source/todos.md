@@ -14,4 +14,3 @@
 - TODO If I guess a word that doesn't have its buckets calculated (a guess, not an answer), calculate its buckets please. Helpful overall. Necessary for Spanish because of cutoff
 - TODO CAN I USE THIS ON MY PHONE SOMEHOW?
   - use github website thingy? `https://pages.github.com/`
-- TODO "Flip a coin" for the user

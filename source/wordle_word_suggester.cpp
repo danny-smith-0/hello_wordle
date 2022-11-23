@@ -5,6 +5,7 @@
 #include <iomanip>   // std::setw
 #include <fstream>   // std::ifstream (and ofstream)
 #include <sstream>   // std::stringstream
+#include <random>    // std::random_device
 
 #include <set>
 
@@ -62,6 +63,18 @@ words_t WordSuggester::subtract_required_letters(std::vector<std::string> const&
     return trimmed_words;
 }
 
+bool flip_a_coin(bool print_results = false)
+{
+    std::random_device rd;
+    std::random_device::result_type random_number = rd();
+    std::random_device::result_type random_max = rd.max();
+    double result = static_cast<double>(random_number) / static_cast<double>(random_max);
+    bool heads =  result < 0.5 ? false : true;
+    if (print_results)
+        std::cout << random_number << "/" << random_max << " = " << result << "\n\n";
+    return heads;
+}
+
 std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& inputs, bool suggest_guesses)
 {
     if (inputs._valid_answers_trimmed.size() == 1)
@@ -73,6 +86,12 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
     if (inputs._valid_answers_trimmed.size() == 2)
     {
         std::cout << "\nFlip a coin!\n" << inputs._valid_answers_trimmed[0] << "\n" << inputs._valid_answers_trimmed[1] << "\n\n";
+
+        // Now pretend to flip a coin
+        bool heads = flip_a_coin();
+        int selected_index =  heads ? 0 : 1;
+        std::cout << "A random number generator chose " << inputs._valid_answers_trimmed[selected_index] << "\n"
+
         return std::map<std::string, colored_buckets_t>();
     }
 
