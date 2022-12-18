@@ -543,3 +543,6 @@ apply
 spoke
 usual
 rival
+probe
+chord
+taper
