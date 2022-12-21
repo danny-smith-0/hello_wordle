@@ -546,3 +546,5 @@ rival
 probe
 chord
 taper
+slate
+third
