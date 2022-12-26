@@ -548,3 +548,8 @@ chord
 taper
 slate
 third
+lunar
+excel
+aorta
+poise
+extra
