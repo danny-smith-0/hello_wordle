@@ -648,3 +648,4 @@ guano
 hurry
 beset
 bread
+every
