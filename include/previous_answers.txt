@@ -650,3 +650,4 @@ beset
 bread
 every
 march
+stock
