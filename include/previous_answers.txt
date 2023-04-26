@@ -672,3 +672,6 @@ plate
 kayak
 broke
 unzip
+ditto
+joker
+metro
