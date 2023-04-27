@@ -22,10 +22,6 @@ void sort_and_remove_non_unique_elements(T* vector_or_string)
 
 void WordSuggester::print_words(int words_per_row, std::vector<std::string> words)
 {
-    // Default to printing the valid answers
-    // if (words.empty())
-    //     words = this->_valid_answers_trimmed;
-
     int count = 1;
     for (auto word : words)
     {
@@ -37,29 +33,6 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
         }
     }
     std::cout << "\n";
-}
-
-words_t WordSuggester::subtract_required_letters(std::vector<std::string> const& words, std::string required_letters, std::string* unspecified_letters)
-{
-    words_t trimmed_words;
-    for (auto word : words)
-    {
-        std::string reqs = required_letters;  // Make a copy so we can edit
-        std::string remaining_letters;
-        for (auto mychar : word)
-        {
-            if (reqs.find(mychar) != std::string::npos)
-                reqs.erase(reqs.find(mychar), 1);
-            else
-                remaining_letters += mychar;
-        }
-
-        trimmed_words.push_back(remaining_letters);
-
-        if (unspecified_letters)
-            *unspecified_letters += remaining_letters;
-    }
-    return trimmed_words;
 }
 
 std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& inputs, bool suggest_guesses)
@@ -75,46 +48,6 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
         std::cout << "\nFlip a coin!\n" << inputs._valid_answers_trimmed[0] << "\n" << inputs._valid_answers_trimmed[1] << "\n\n";
         return std::map<std::string, colored_buckets_t>();
     }
-
-    // Get all the letters in the words that weren't required, grouped all together and by word
-    std::string unspecified_letters = "";
-
-    subtract_required_letters(inputs._valid_answers_trimmed, inputs._required_letters, &unspecified_letters);
-
-    // Count (score) the unspecified letters
-    std::sort(unspecified_letters.begin(), unspecified_letters.end());
-    std::map<char, size_t> letter_count;
-    if (!unspecified_letters.empty())
-    {
-        letter_count[unspecified_letters[0]] = 1;
-        for (auto itr = unspecified_letters.begin(); itr != unspecified_letters.end() - 1; ++itr)
-        {
-            if (*(itr + 1) == *itr)
-                ++letter_count[*itr];
-            else
-                letter_count[*(itr + 1)] = 1;
-        }
-    }
-
-    // Backwards letter count, then print in order
-    std::map<size_t, std::string> backwards_letter_count;
-    for (auto [letter, score] : letter_count)
-        backwards_letter_count[score] += letter;
-
-    std::stringstream ss;
-    std::cout << "Scoring the remaining words by the count of their unique unspecified letters\n ";
-    for (auto ritr = backwards_letter_count.rbegin(); ritr != backwards_letter_count.rend(); ++ritr)
-    {
-        std::string letters = ritr->second;
-        while (!letters.empty())
-        {
-            std::cout << "    " << letters[0] << " ";
-            letters.erase(0, 1);
-            ss << std::fixed << std::setw(6) << ritr->first;
-        }
-    }
-    std::cout << "\n" << ss.str() << "\n\n";
-
 
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
@@ -150,7 +83,7 @@ colored_buckets_t WordSuggester::calc_buckets(std::string guess, std::vector<std
                     color_res += "G";
                 else
                 {
-                    // Handle duplicates
+                    // Handle duplicates - TODO Handle triplicates
                     if (std::count(guess.begin(), guess.end(), guess_letter) > 1)
                     {
                         //if I'm first, and the other one is not green, I get to be yellow
@@ -280,20 +213,8 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs c
 
 std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs const& inputs, bool suggest_guesses)
 {
-    static bool first_call = true;
     std::cout  << "how_many_words_remain_after_guess\nanswers: (out of " << inputs._valid_answers_trimmed.size() << ")\n";
     std::map<std::string, colored_buckets_t> answer_buckets_trim = collect_buckets(inputs, inputs._valid_answers_trimmed);
-
-    if (!first_call)
-    {
-        std::string required_letters = WordSuggester::find_required_letters(inputs._valid_answers_trimmed);
-        words_t trimmed_words = WordSuggester::subtract_required_letters(inputs._valid_answers_trimmed, required_letters);
-        std::cout << "\n";
-        for (auto word : trimmed_words)
-            std::cout << word << ", ";
-        std::cout << "\n\n";
-    }
-    first_call = false;
 
     // // Quordle
     // std::cout  << "\n\nuntrimmed answers:\n";
@@ -342,41 +263,6 @@ words_t words_list_intersection(words_t const& w1, words_t const& w2)
     return intersection;
 }
 
-std::string WordSuggester::find_required_letters(words_t words)
-{
-    bool first_word = true;
-    std::string required_letters;
-    for (auto word : words)
-    {
-        if (first_word)
-        {
-            // For a letter to be required in all words, it has to be in the first word
-            required_letters = word;
-            first_word = false;
-        }
-        else
-        {
-            for (std::string::iterator potential_letter_itr = required_letters.begin(); potential_letter_itr != required_letters.end(); )
-            {
-                // Check if current word has the potentially required letter in it. If it does, continue. If not, mark this letter as not required
-                auto location = word.find(*potential_letter_itr);
-                if (location != std::string::npos)
-                {
-                    // This character is in both words. Count them in both. If there are more in the req letters, remove this instance.
-                    size_t n_reqs = std::count(required_letters.begin(), required_letters.end(), *potential_letter_itr);
-                    size_t n_word = std::count(word.begin(), word.end(), *potential_letter_itr);
-                    if (n_reqs > n_word)
-                        potential_letter_itr = required_letters.erase(potential_letter_itr);
-                    else
-                        ++potential_letter_itr;
-                }
-                else
-                    potential_letter_itr = required_letters.erase(potential_letter_itr);
-            }
-        }
-    }
-    return required_letters;
-}
 
 words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answers)
 {
@@ -398,11 +284,6 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         {
             std::cout << "\n";
             for (auto word : words)
-                std::cout << word << ", ";
-            std::cout << ":: ";
-            std::string required_letters = WordSuggester::find_required_letters(words);
-            words_t trimmed_words = WordSuggester::subtract_required_letters(words, required_letters);
-            for (auto word : trimmed_words)
                 std::cout << word << ", ";
             std::cout << "\n\n";
         }
