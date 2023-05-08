@@ -684,3 +684,5 @@ sulky
 horde
 guppy
 below
+anger
+ghoul
