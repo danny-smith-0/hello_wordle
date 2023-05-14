@@ -686,3 +686,9 @@ guppy
 below
 anger
 ghoul
+aglow
+cocoa
+ethic
+broom
+snack
+acrid
