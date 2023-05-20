@@ -693,3 +693,8 @@ broom
 snack
 acrid
 scarf
+canoe
+latte
+plank
+shorn
+grief
