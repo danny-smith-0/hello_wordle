@@ -700,3 +700,12 @@ shorn
 grief
 flask
 brash
+igloo
+clerk
+utter
+bagel
+swine
+ramen
+skimp
+mouse
+kneel
