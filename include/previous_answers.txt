@@ -709,3 +709,10 @@ ramen
 skimp
 mouse
 kneel
+agile
+jazzy
+humid
+nanny
+beast
+ennui
+scout
