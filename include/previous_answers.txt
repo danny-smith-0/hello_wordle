@@ -716,3 +716,5 @@ nanny
 beast
 ennui
 scout
+hater
+crumb
