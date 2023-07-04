@@ -316,6 +316,10 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         std::getline (std::cin, guess_str);
         std::getline (std::cin, result_str);
 
+        // Make sure the inputs are the correct case to work with this function (lower for guess, upper for result)
+        std::transform(guess_str.begin(), guess_str.end(), guess_str.begin(), std::tolower);
+        std::transform(result_str.begin(), result_str.end(), result_str.begin(), std::toupper);
+
         words_t trimmed_words;
         if (first_guess)
         {
