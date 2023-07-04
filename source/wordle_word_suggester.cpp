@@ -384,11 +384,6 @@ int main()
     Inputs inputs(game_type);
     std::cout << "Libraries loaded.\n";
 
-    bool duplicate = true;
-    // inputs.B('');
-    // inputs.G('', );
-    // inputs.Y('', );
-
     WordSuggester word_suggester;
     bool suggest_guesses = false;
     // inputs._valid_answers_trimmed.push_back("when_using_guess_words_put_them_here");
