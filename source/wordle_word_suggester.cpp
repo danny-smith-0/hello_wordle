@@ -63,7 +63,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
         // Now pretend to flip a coin
         bool heads = flip_a_coin();
         int selected_index =  heads ? 0 : 1;
-        std::cout << "A random number generator chose " << inputs._valid_answers_trimmed[selected_index] << "\n";
+        std::cout << "A random number generator chose " << inputs._valid_answers_trimmed[selected_index] << "\n\n";
 
         return std::map<std::string, colored_buckets_t>();
     }
