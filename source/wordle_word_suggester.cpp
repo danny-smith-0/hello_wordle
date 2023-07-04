@@ -63,7 +63,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
         // Now pretend to flip a coin
         bool heads = flip_a_coin();
         int selected_index =  heads ? 0 : 1;
-        std::cout << "A random number generator chose " << inputs._valid_answers_trimmed[selected_index] << "\n";
+        std::cout << "A random number generator chose " << inputs._valid_answers_trimmed[selected_index] << "\n\n";
 
         return std::map<std::string, colored_buckets_t>();
     }
@@ -316,6 +316,10 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         std::getline (std::cin, guess_str);
         std::getline (std::cin, result_str);
 
+        // Make sure the inputs are the correct case to work with this function (lower for guess, upper for result)
+        std::transform(guess_str.begin(), guess_str.end(), guess_str.begin(), std::tolower);
+        std::transform(result_str.begin(), result_str.end(), result_str.begin(), std::toupper);
+
         words_t trimmed_words;
         if (first_guess)
         {
@@ -383,11 +387,6 @@ int main()
     GameType game_type = what_game();
     Inputs inputs(game_type);
     std::cout << "Libraries loaded.\n";
-
-    bool duplicate = true;
-    // inputs.B('');
-    // inputs.G('', );
-    // inputs.Y('', );
 
     WordSuggester word_suggester;
     bool suggest_guesses = false;
