@@ -435,7 +435,7 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         if (first_guess)
         {
             if (guess_str.empty())
-                guess_str = "slate"; // Assume the word input is "slate" if the first line is blank
+                guess_str = "parse"; // Assume the word input is "parse" if the first line is blank
             trimmed_words = answers[guess_str][result_str];
         }
         else
