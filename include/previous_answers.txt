@@ -749,3 +749,10 @@ windy
 donut
 cower
 enter
+folly
+earth
+whirl
+barge
+fiend
+crone
+topaz
