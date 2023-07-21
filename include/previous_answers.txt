@@ -756,3 +756,6 @@ barge
 fiend
 crone
 topaz
+droop
+tonic
+flank
