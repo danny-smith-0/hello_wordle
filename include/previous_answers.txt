@@ -759,3 +759,8 @@ topaz
 droop
 tonic
 flank
+burly
+froze
+whale
+hobby
+wheel
