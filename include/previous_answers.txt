@@ -764,3 +764,6 @@ froze
 whale
 hobby
 wheel
+heart
+disco
+ethos
