@@ -767,3 +767,4 @@ wheel
 heart
 disco
 ethos
+curly
