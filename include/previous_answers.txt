@@ -769,3 +769,6 @@ disco
 ethos
 curly
 bathe
+style
+tenth
+beget
