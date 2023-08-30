@@ -792,3 +792,10 @@ magma
 quest
 beach
 spice
+verve
+wordy
+ocean
+choir
+peace
+write
+caper
