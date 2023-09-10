@@ -808,3 +808,5 @@ giddy
 birch
 gnash
 dwell
+rouse
+lucky
