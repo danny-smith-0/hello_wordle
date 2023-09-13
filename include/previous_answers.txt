@@ -757,6 +757,7 @@ fiend
 crone
 topaz
 droop
+flyer
 tonic
 flank
 burly
