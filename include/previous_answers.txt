@@ -816,3 +816,5 @@ older
 whisk
 clear
 rayon
+exert
+angel
