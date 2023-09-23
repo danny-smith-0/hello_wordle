@@ -820,3 +820,7 @@ exert
 angel
 music
 frank
+close
+snare
+stone
+brush
