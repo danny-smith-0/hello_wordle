@@ -824,3 +824,8 @@ close
 snare
 stone
 brush
+carol
+right
+rocky
+loyal
+smile
