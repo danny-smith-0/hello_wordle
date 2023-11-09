@@ -866,3 +866,9 @@ bleak
 noise
 until
 ardor
+mania
+flare
+trade
+limit
+ninja
+glaze
