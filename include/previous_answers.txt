@@ -872,3 +872,10 @@ trade
 limit
 ninja
 glaze
+leash
+actor
+meant
+green
+sassy
+sight
+trust
