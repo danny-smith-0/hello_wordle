@@ -879,3 +879,7 @@ green
 sassy
 sight
 trust
+tardy
+think
+candy
+piano
