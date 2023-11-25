@@ -881,5 +881,9 @@ sight
 trust
 tardy
 think
+queue
 candy
 piano
+pixel
+queen
+throw
