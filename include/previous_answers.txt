@@ -887,3 +887,8 @@ piano
 pixel
 queen
 throw
+guide
+solid
+tawny
+scope
+sushi
