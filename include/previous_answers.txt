@@ -917,3 +917,5 @@ built
 touch
 slope
 grace
+evoke
+phone
