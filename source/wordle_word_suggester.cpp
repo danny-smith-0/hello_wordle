@@ -5,6 +5,7 @@
 #include <iomanip>   // std::setw
 #include <fstream>   // std::ifstream (and ofstream)
 #include <sstream>   // std::stringstream
+#include <random>    // std::random_device
 
 #include <set>
 
@@ -24,10 +25,6 @@ void sort_and_remove_non_unique_elements(T* vector_or_string)
 
 void WordSuggester::print_words(int words_per_row, std::vector<std::string> words)
 {
-    // Default to printing the valid answers
-    // if (words.empty())
-    //     words = this->_valid_answers_trimmed;
-
     int count = 1;
     for (auto word : words)
     {
@@ -41,27 +38,16 @@ void WordSuggester::print_words(int words_per_row, std::vector<std::string> word
     std::cout << "\n";
 }
 
-words_t WordSuggester::subtract_required_letters(std::vector<std::string> const& words, std::string required_letters, std::string* unspecified_letters)
+bool flip_a_coin(bool print_results = false)
 {
-    words_t trimmed_words;
-    for (auto word : words)
-    {
-        std::string reqs = required_letters;  // Make a copy so we can edit
-        std::string remaining_letters;
-        for (auto mychar : word)
-        {
-            if (reqs.find(mychar) != std::string::npos)
-                reqs.erase(reqs.find(mychar), 1);
-            else
-                remaining_letters += mychar;
-        }
-
-        trimmed_words.push_back(remaining_letters);
-
-        if (unspecified_letters)
-            *unspecified_letters += remaining_letters;
-    }
-    return trimmed_words;
+    std::random_device rd;
+    std::random_device::result_type random_number = rd();
+    std::random_device::result_type random_max = rd.max();
+    double result = static_cast<double>(random_number) / static_cast<double>(random_max);
+    bool heads =  result < 0.5 ? false : true;
+    if (print_results)
+        std::cout << random_number << "/" << random_max << " = " << result << "\n\n";
+    return heads;
 }
 
 std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& inputs, bool suggest_guesses)
@@ -75,10 +61,14 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
     if (inputs._valid_answers_trimmed.size() == 2)
     {
         std::cout << "\nFlip a coin!\n" << inputs._valid_answers_trimmed[0] << "\n" << inputs._valid_answers_trimmed[1] << "\n\n";
-        // TODO is there a random function I could implement here to simulate a coin flip?
+
+        // Now pretend to flip a coin
+        bool heads = flip_a_coin();
+        int selected_index =  heads ? 0 : 1;
+        std::cout << "A random number generator chose " << inputs._valid_answers_trimmed[selected_index] << "\n\n";
+
         return std::map<std::string, colored_buckets_t>();
     }
-
 
     /*
     Idea of next pass on score - what word, if guessed could give us the most information about the remaining words?
@@ -115,7 +105,7 @@ colored_buckets_t WordSuggester::calc_buckets(std::string guess, std::vector<std
                     color_res += "G";
                 else
                 {
-                    // Handle duplicates
+                    // Handle duplicates - TODO Handle triplicates
                     if (std::count(guess.begin(), guess.end(), guess_letter) > 1)
                     {
                         //if I'm first, and the other one is not green, I get to be yellow
@@ -245,20 +235,8 @@ std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs c
 
 std::map<std::string, colored_buckets_t> WordSuggester::collect_buckets(Inputs const& inputs, bool suggest_guesses)
 {
-    static bool first_call = true;
     std::cout  << "how_many_words_remain_after_guess\nanswers: (out of " << inputs._valid_answers_trimmed.size() << ")\n";
     std::map<std::string, colored_buckets_t> answer_buckets_trim = collect_buckets(inputs, inputs._valid_answers_trimmed);
-
-    if (!first_call)
-    {
-        std::string required_letters = WordSuggester::find_required_letters(inputs._valid_answers_trimmed);
-        words_t trimmed_words = WordSuggester::subtract_required_letters(inputs._valid_answers_trimmed, required_letters);
-        std::cout << "\n";
-        for (auto word : trimmed_words)
-            std::cout << word << ", ";
-        std::cout << "\n\n";
-    }
-    first_call = false;
 
     // // Quordle
     // std::cout  << "\n\nuntrimmed answers:\n";
@@ -307,40 +285,26 @@ words_t words_list_intersection(words_t const& w1, words_t const& w2)
     return intersection;
 }
 
-std::string WordSuggester::find_required_letters(words_t words)
+bool get_boolean_from_user_0_or_1(std::string print_message)
 {
-    bool first_word = true;
-    std::string required_letters;
-    for (auto word : words)
+    bool result;
+
+    bool bad_input = true;
+    while (bad_input)
     {
-        if (first_word)
+        std::cout << print_message;
+        std::string input_string;
+        std::getline (std::cin, input_string);
+        if (input_string == "0" || input_string == "1")
         {
-            // For a letter to be required in all words, it has to be in the first word
-            required_letters = word;
-            first_word = false;
+            std::stringstream(input_string) >> result;
+            bad_input = false;
         }
         else
-        {
-            for (std::string::iterator potential_letter_itr = required_letters.begin(); potential_letter_itr != required_letters.end(); )
-            {
-                // Check if current word has the potentially required letter in it. If it does, continue. If not, mark this letter as not required
-                auto location = word.find(*potential_letter_itr);
-                if (location != std::string::npos)
-                {
-                    // This character is in both words. Count them in both. If there are more in the req letters, remove this instance.
-                    size_t n_reqs = std::count(required_letters.begin(), required_letters.end(), *potential_letter_itr);
-                    size_t n_word = std::count(word.begin(), word.end(), *potential_letter_itr);
-                    if (n_reqs > n_word)
-                        potential_letter_itr = required_letters.erase(potential_letter_itr);
-                    else
-                        ++potential_letter_itr;
-                }
-                else
-                    potential_letter_itr = required_letters.erase(potential_letter_itr);
-            }
-        }
+            std::cout << "\nBad input. Try again\n\n";
     }
-    return required_letters;
+
+    return result;
 }
 
 words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answers)
@@ -354,49 +318,54 @@ words_t trim_words_by_user_inputs(std::map<std::string, colored_buckets_t>& answ
         std::cout << "--Enter your guess and color result on two separate lines \n";
         std::getline (std::cin, guess_str);
         std::getline (std::cin, result_str);
+
+        // Make sure the inputs are the correct case to work with this function (lower for guess, upper for result)
+        std::transform(guess_str.begin(), guess_str.end(), guess_str.begin(), std::tolower);
+        std::transform(result_str.begin(), result_str.end(), result_str.begin(), std::toupper);
+
+        words_t trimmed_words;
         if (first_guess)
-            words = answers[guess_str][result_str];
-        else
-            words = words_list_intersection(words, answers[guess_str][result_str]);
-        std::cout << "Guess: " << guess_str << ", result: " << result_str << ". Words remaining: " << words.size() << "\n";
-        if (words.size() < 9)
         {
-            std::cout << "\n";
-            for (auto word : words)
-                std::cout << word << ", ";
-            std::cout << ":: ";
-            std::string required_letters = WordSuggester::find_required_letters(words);
-            words_t trimmed_words = WordSuggester::subtract_required_letters(words, required_letters);
-            for (auto word : trimmed_words)
-                std::cout << word << ", ";
-            std::cout << "\n\n";
-        }
-        first_guess = false;
-        if (words.size() > 1 && ++count < 6)
-        {
-            std::cout << "--Another guess or proceed to suggestions? (0 = proceed. 1: more guesses)\n";
-            std::getline (std::cin, bool_str);
-            std::stringstream(bool_str) >> more_guesses;
+            if (guess_str.empty())
+                guess_str = "parse"; // Assume the word input is "parse" if the first line is blank
+            trimmed_words = answers[guess_str][result_str];
         }
         else
-            more_guesses = false;
+        {
+            // For every guess after the first, find the intersection between the remaining possible words and the possible words based on the current guess
+            trimmed_words = words_list_intersection(words, answers[guess_str][result_str]);
+        }
+
+        if (trimmed_words.empty())
+        {
+            // If the intersection is zero (probably because of bad input), try again!
+            std::cout << "\nBad input! No solutions remaining. Try last entry again\n\n";
+            more_guesses = true;
+        }
+        else
+        {
+            words = trimmed_words;
+            std::cout << "Guess: " << guess_str << ", result: " << result_str << ". Words remaining: " << words.size() << "\n";
+            if (words.size() < 9)
+            {
+                std::cout << "\n";
+                for (auto word : words)
+                    std::cout << word << ", ";
+                std::cout << "\n\n";
+            }
+
+            first_guess = false;
+
+            if (words.size() > 1 && ++count < 6)
+                more_guesses = get_boolean_from_user_0_or_1("--Another guess or proceed to suggestions? (0 = proceed. 1: more guesses)\n");
+            else
+                more_guesses = false;
+        }
     }
     while (more_guesses);
+
     std::cout << std::endl;
     return words;
-}
-
-bool user_says_to_suggest_guesses()
-{
-    bool suggest_guesses = false;
-
-    // cin suggest_guesses
-    std::string bool_str;
-    std::cout << "--Enter preferred type of suggestions: (0 = valid answers only, 1 = valid answers and guesses)\n";
-    std::getline (std::cin, bool_str);
-    std::stringstream(bool_str) >> suggest_guesses;
-
-    return suggest_guesses;
 }
 
 GameType what_game()
@@ -405,7 +374,8 @@ GameType what_game()
     std::cout << "What game would you like to play? ("
         << static_cast<int>(GameType::wordle)    << " = wordle, "
         << static_cast<int>(GameType::quordle)   << " = quordle, "
-        << static_cast<int>(GameType::wordle_es) << " = wordle en español)\n";
+        << static_cast<int>(GameType::wordle_es) << " = wordle en español), "
+        << static_cast<int>(GameType::nerdle)    << " = nerdle\n";
     std::getline (std::cin, input_str);
     int game_type_int = 0;
     std::stringstream(input_str) >> game_type_int;
@@ -420,11 +390,6 @@ int main()
     GameType game_type = what_game();
     Inputs inputs(game_type);
     std::cout << "Libraries loaded.\n";
-
-    bool duplicate = true;
-    // inputs.B('');
-    // inputs.G('', );
-    // inputs.Y('', );
 
     WordSuggester word_suggester;
     bool suggest_guesses = false;
@@ -441,7 +406,7 @@ int main()
 
         // Allow user to request guesses if there are more than 2 remaining possibilities
         if (words.size() > 2)
-            suggest_guesses = user_says_to_suggest_guesses();
+            suggest_guesses = get_boolean_from_user_0_or_1("--Enter preferred type of suggestions: (0 = valid answers only, 1 = valid answers and guesses)\n");
 
         word_suggester.suggest(inputs, suggest_guesses);
 

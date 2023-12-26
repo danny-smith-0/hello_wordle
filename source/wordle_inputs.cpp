@@ -19,6 +19,8 @@ void Inputs::load_words(GameType game_type)
     std::ifstream file_stream;
     if (game_type == GameType::wordle_es)
         file_stream.open("../include/wordle_es.txt");
+    else if (game_type == GameType::nerdle)
+        file_stream.open("../nerdle/solutions.txt");
     else
         file_stream.open("../include/valid_answers.txt");
 
@@ -28,7 +30,7 @@ void Inputs::load_words(GameType game_type)
     file_stream.close();
 
     // Get valid guesses
-    if (game_type == GameType::wordle_es)
+    if (game_type == GameType::wordle_es || game_type == GameType::nerdle)
         _valid_guesses_orig = _valid_answers_orig;
     else
     {
@@ -52,8 +54,18 @@ void Inputs::load_words(GameType game_type)
     if (game_type == GameType::wordle)
     {
         file_stream.open("../include/previous_answers.txt");
+        std::vector<std::string> prev_answers;
         std::string prev_answer;
         while (std::getline(file_stream, prev_answer))
+            prev_answers.push_back(prev_answer);
+
+        // Also remove the words before I started playing wordle
+        file_stream.close();
+        file_stream.open("../include/before_i_played_wordle.txt");
+        while (std::getline(file_stream, prev_answer))
+            prev_answers.push_back(prev_answer);
+
+        for (auto prev_answer : prev_answers)
         {
             // If the previous answer actually is in the answer set (it should be), remove from the answer set and add it to guess set
             auto prev_answer_itr = std::find(_valid_answers_orig.begin(), _valid_answers_orig.end(), prev_answer);
