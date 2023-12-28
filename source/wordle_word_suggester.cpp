@@ -80,7 +80,7 @@ std::map<std::string, colored_buckets_t> WordSuggester::suggest(Inputs const& in
     */
 
     std::map<std::string, colored_buckets_t> answers = this->collect_buckets(inputs, suggest_guesses);
-    print::print_colored_buckets_to_json(answers, "slate");
+    print::print_colored_buckets_to_json(answers, "parse");
     return answers;
 }
 
