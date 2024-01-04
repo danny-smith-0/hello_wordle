@@ -924,3 +924,7 @@ learn
 child
 three
 salty
+mural
+aging
+twirl
+scant
