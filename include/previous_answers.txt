@@ -946,3 +946,14 @@ thing
 large
 north
 tweak
+still
+relic
+block
+aloof
+snake
+ember
+leggy
+expel
+bulky
+alive
+cleft
